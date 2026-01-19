@@ -1,0 +1,12 @@
+bin/*
+*.o
+*.so
+*.a
+*.swp
+*.d
+*.x
+*.out
+*.mid
+*~
+make/obj/*
+hof.txt

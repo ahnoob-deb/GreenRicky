@@ -1,0 +1,57 @@
+To display textures in different colors in SDL3, use the SDL_SetTextureColorMod() function 
+with a SDL_Color or SDL_FColor structure, or by directly setting RGB values to apply a 
+color multiplier to the texture during rendering. For dynamic coloring, ensure your base 
+texture is white or transparent, allowing the color mod to define the final color. 
+
+Using SDL_SetTextureColorMod()
+This is the recommended and most straightforward method in SDL3 to color-modulate a texture. 
+
+    Set the Modulating Color: Before rendering the texture, 
+    call SDL_SetTextureColorMod() with the texture you want to change 
+    and the desired RGB color values.
+    
+        texture: The SDL_Texture you intend to color.
+        r, g, b: The red, green, and blue color values, respectively, ranging from 0 to 255. 
+
+C
+
+    // Set the texture to red
+    SDL_SetTextureColorMod(myTexture, 255, 0, 0);
+
+    // Set the texture to blue
+    SDL_SetTextureColorMod(myTexture, 0, 0, 255);
+
+    Render the Texture: After setting the color mod, render the texture as you normally 
+    would using SDL_RenderCopy() or SDL_RenderTexture(). 
+
+Considerations for Base Texture Color
+
+    White Base Texture:
+    For best results, use an image texture that is white. This ensures that the color mod 
+    effectively sets the desired color without being "washed out" by the original texture's 
+    colors. 
+
+Alpha Channel:
+The SDL_SetTextureColorMod() function multiplies the color values and does not affect the alpha
+ (transparency) channel. 
+
+Resetting Color Mod:
+If you have multiple objects using the same texture, you may need to reset the color mod to white (255, 255, 255) if the previous object had a different color mod set. 
+
+C
+
+// Example of resetting the color mod
+void render_object(SDL_Renderer* renderer, SDL_Texture* texture, 
+SDL_Rect dest, SDL_Color color) {
+    SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+    // Reset to white for other objects using the same texture
+    SDL_SetTextureColorMod(texture, 255, 255, 255);
+}
+
+For Per-Pixel Coloring 
+
+    For more complex scenarios where you need to set individual pixel colors rather 
+    than a global tint, you'll need to work with the texture's pixel data. This 
+    involves creating an SDL_Surface, locking it, modifying its pixel data directly, 
+    and then creating a new texture from the modified surface.

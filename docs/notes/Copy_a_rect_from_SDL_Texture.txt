@@ -1,0 +1,52 @@
+Google AI :
+
+To copy a portion of an SDL_Texture in SDL3, use the SDL_RenderTexture function, 
+passing the SDL_Renderer, the SDL_Texture, a SDL_FRect (or SDL_Rect) for the source 
+rectangle, and a SDL_FRect (or SDL_Rect) for the destination rectangle. This function 
+copies the specified rectangular portion from the source texture to the destination area 
+on the current rendering target. 
+
+C
+
+#include <SDL3/SDL.h>
+
+// Example usage within your game loop:
+// Assume sdlRenderer and sdlTexture are valid SDL_Renderer and SDL_Texture pointers
+// Assume srcRect defines the portion of the source texture to copy (e.g., for a sprite)
+// Assume destRect defines the position and size on the screen where the copied portion will be drawn
+
+// Example source and destination rectangles
+SDL_FRect srcRect = {10.0f, 20.0f, 50.0f, 60.0f}; // x, y, width, height
+SDL_FRect destRect = {100.0f, 150.0f, 50.0f, 60.0f}; // x, y, width, height
+
+// Render the portion of the texture
+unsigned short success = SDL_RenderTexture(
+    sdlRenderer,
+    sdlTexture,
+    &srcRect,
+    &destRect
+);
+
+if (!success) {
+    // Handle rendering error
+    SDL_Log("Error rendering texture portion: %s", SDL_GetError());
+}
+
+Explanation:
+
+    SDL_Renderer *renderer: The SDL renderer you are using to draw.
+    SDL_Texture *texture: The source texture you want to copy from.
+    const SDL_FRect *srcrect: A pointer to the source rectangle defining the region within the texture to be copied. Use NULL to copy the entire texture.
+    const SDL_FRect *destrect: A pointer to the destination rectangle on the rendering target where the copied portion will be drawn. 
+
+Key Points:
+
+    Floating-Point Precision:
+    SDL3's SDL_RenderTexture function supports SDL_FRect for sub-pixel precision, which is useful for detailed scaling and positioning. 
+
+Rendering Target:
+The copying operation happens to the current rendering target. This is often the window's backbuffer, but could also be another texture set as a render target. 
+Source Rectangle (srcrect):
+This rectangle specifies the exact pixels to copy from the texture. 
+Destination Rectangle (destrect):
+This rectangle specifies where the copied pixels will be placed and scaled on the screen. 
