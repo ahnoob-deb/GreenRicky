@@ -154,6 +154,8 @@ static void save_highscore(void) {
 
 		 fclose(f);*/
 
+	} else {
+		printf("simulation of save :\n");
 	}
 }
 
@@ -179,7 +181,7 @@ static void position_current_score() {
 				current_score->score);
 
 		for (i = 0; (i < MAX_TOPS) && (hof_data[i] != NULL); i++) {
-			if (atoi(hof_data[i]->score) <= atoi(current_score->score)) {
+			if (atoi(hof_data[i]->score) < atoi(current_score->score)) {
 				found_place = TRUE;
 				break;
 			}
@@ -219,11 +221,11 @@ static void read_highscore() {
 
 	while ((fgets(line, MAX_LINE_LENGTH, f) != NULL) && (i < MAX_TOPS)) {
 
-		int last_char = strlen(line)-1;
+		int last_char = strlen(line) - 1;
 
 		/* Remove newline-char at end of line */
-		if (line[last_char]=='\n')
-			line[last_char]='\0';
+		if (line[last_char] == '\n')
+			line[last_char] = '\0';
 
 		no = 0;
 
@@ -285,15 +287,15 @@ static void hof_dispatch_core_events(int p_ev) {
 	if (p_ev != EV_NO_EVENT) {
 
 		printf("HOF-DISPATCH-EVENT ::: %d\n", p_ev);
+		printf("HOF-EDIT ::: %d\n", hof_edit);
+		printf("FIRST_LETTER_SET ::: %d\n", hof_first_letter_set);
 
 		if (p_ev == SDLK_ESCAPE) {
 			hof_game_state = ST_MAIN_MENU;
-			save_highscore();
 			return;
 		}
 		if (p_ev == EV_INSTANT_QUIT) {
 			hof_game_state = ST_EXIT;
-			save_highscore();
 			return;
 		}
 		if (p_ev == SDLK_F10) {
@@ -305,22 +307,25 @@ static void hof_dispatch_core_events(int p_ev) {
 			if (p_ev == SDLK_RETURN) {
 				if (hof_first_letter_set) {
 					hof_edit = FALSE;
+					save_highscore();
 				}
 				return;
 			}
 			if (p_ev == SDLK_SPACE) {
 				if (hof_first_letter_set) {
-					if (hof_letter_index < MAX_NAME_LEN)
+					if (hof_letter_index < MAX_NAME_LEN) {
+						printf("adding space at %d\n", hof_letter_index);
 						hof_data[hof_change_index]->name[hof_letter_index++] =
 								' ';
-					hof_first_letter_set = TRUE;
+					}
 				}
 				return;
 			}
 			if (p_ev == SDLK_BACKSPACE) {
-				if (hof_letter_index > 0)
+				if (hof_letter_index > 0) {
+					printf("removing char at %d\n", hof_letter_index - 1);
 					hof_data[hof_change_index]->name[--hof_letter_index] = '\0';
-				else
+				} else
 					hof_first_letter_set = FALSE;
 				return;
 			}
@@ -339,6 +344,7 @@ static void hof_dispatch_core_events(int p_ev) {
 			}
 			if (((p_ev >= (int) SDLK_0) && (p_ev <= (int) SDLK_9))
 					|| ((p_ev >= (int) SDLK_A) && (p_ev <= (int) SDLK_Z))) {
+				printf("adding printable char at %d\n", hof_letter_index);
 				if (hof_letter_index < MAX_NAME_LEN) {
 					hof_data[hof_change_index]->name[hof_letter_index++] = p_ev;
 					hof_first_letter_set = TRUE;
