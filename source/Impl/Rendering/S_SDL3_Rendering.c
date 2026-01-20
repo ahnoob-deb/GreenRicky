@@ -309,9 +309,9 @@ void sdla_printf_tex(const int p_x, const int p_y, unsigned int p_col,
 						p_y + LETTER_MATRIX_HEIGHT);
 
 				draw_start_x += SPACEING;
-			} else if (isspace(ch)) {
-				draw_start_x += SPACEING;
 			}
+		} else if (isspace(ch)) {
+			draw_start_x += SPACEING;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 1024;dennisr
-200;kent
-110;osccoder
-20;brian
+1000;kent
+999;briank
+800;noob
+666;Lord of Terror

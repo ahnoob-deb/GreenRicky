@@ -4,6 +4,6 @@
 #define LETTER_MATRIX_WIDTH  40
 #define LETTER_MATRIX_HEIGHT 40
 
-#define SPACEING 20
+#define SPACEING 18
 
 #endif
