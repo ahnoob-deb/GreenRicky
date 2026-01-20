@@ -85,14 +85,14 @@ static void hof_init(unsigned int p_score) {
 	hof_score = p_score;
 	if (hof_score > 0) {
 		hof_edit = TRUE;
-		hof_save = TRUE;
+		hof_save = FALSE;
 	}
 
 	printf("score is %d, hof_edit is %d.\n", hof_score, hof_edit);
 
 	init_highscore_table();
-	printf("after init :\n");
-	print_hof_table();
+	/*printf("after init :\n");
+	 print_hof_table();*/
 
 	read_highscore();
 
@@ -123,13 +123,16 @@ static void free_highscore_table() {
 
 static void hof_insert_rank(int p_position, HSCData *p_data) {
 
+	printf("inserting %s[%s] at index %d.\n", p_data->name, p_data->score,
+			p_position);
+
 	HSCData *temp = NULL;
 
 	if (p_position < MAX_TOPS - 1) {
 
 		temp = hof_data[p_position];
-
-		hof_insert_rank(p_position + 1, temp);
+		if (temp != NULL)
+			hof_insert_rank(p_position + 1, temp);
 
 		hof_data[p_position] = p_data;
 	} else {
@@ -145,9 +148,13 @@ static void save_highscore(void) {
 
 	printf("max index is: %d\n", max_index);
 
-	/*FILE *f = fopen(FILE_HOF, "w");
+	if (hof_save) {
 
-	 fclose(f);*/
+		/*FILE *f = fopen(FILE_HOF, "w");
+
+		 fclose(f);*/
+
+	}
 }
 
 static void position_current_score() {
@@ -163,15 +170,15 @@ static void position_current_score() {
 		int i = 0;
 		int found_place = FALSE;
 
-		current_score = calloc(1, sizeof(HSCData));
+		current_score = (HSCData*) calloc(1, sizeof(HSCData));
 
 		snprintf(current_score->score, MAX_SCORE_LEN, "%d", hof_score);
-		snprintf(current_score->name, MAX_SCORE_LEN, "%s", "");
+		snprintf(current_score->name, MAX_NAME_LEN, "%s", "");
 
 		printf("HIGHSCORE : %s : %s\n", current_score->name,
 				current_score->score);
 
-		for (i = 0; i < MAX_TOPS; i++) {
+		for (i = 0; (i < MAX_TOPS) && (hof_data[i] != NULL); i++) {
 			if (atoi(hof_data[i]->score) <= atoi(current_score->score)) {
 				found_place = TRUE;
 				break;
@@ -180,10 +187,16 @@ static void position_current_score() {
 
 		hof_change_index = i;
 
-		printf("you reached place #%d\n", hof_change_index + 1);
+		if (hof_change_index < MAX_TOPS) {
+			found_place = TRUE;
+		} else {
+			hof_edit = FALSE;
+		}
 
-		if (found_place == TRUE && i < MAX_TOPS) {
-			printf("found place - replacing old highscore.\n");
+		printf("you reached place : %d\n", hof_change_index + 1);
+
+		if ((found_place) && (i < MAX_TOPS)) {
+			printf("found place - place new highscore.\n");
 
 			hof_insert_rank(i, current_score);
 		}
@@ -207,10 +220,8 @@ static void read_highscore() {
 	while ((fgets(line, MAX_LINE_LENGTH, f) != NULL) && (i < MAX_TOPS)) {
 		no = 0;
 
-
 		token = strtok(line, HOF_DELIMITER);
 		printf("\n");
-
 
 		hof_data[i] = (HSCData*) calloc(1, sizeof(HSCData));
 
@@ -235,7 +246,6 @@ static void read_highscore() {
 		}
 
 		i++;
-        printf("%d\n",i);
 	}
 
 	fclose(f);
@@ -251,6 +261,8 @@ static void hof_main_loop() {
 	printf("setting score %u\n", hof_score);
 
 	position_current_score();
+
+	print_hof_table();
 
 	while (!hof_exit_flag && hof_game_state == ST_HALL_OF_FAME) {
 		hof_dispatch_core_events(sdla_process_events());
@@ -339,20 +351,20 @@ static void hof_core_render() {
 	int x = 80;
 	int y = 170;
 	unsigned int hof_color = HOF_COLOR;
-	//unsigned int hof_cscore_color = HOF_CSCORE_COLOR;
+	unsigned int hof_cscore_color = HOF_CSCORE_COLOR;
 
 	while (hof_data[i] != NULL && i < MAX_TOPS) {
-		/*	if ((i == hof_change_index) && hof_edit) {
-		 if (strlen(hof_data[i]->score) > 0) {
-		 sdla_printf_tex(x, y, hof_cscore_color, hof_data[i]->score);
-		 sdla_printf_tex(x + 5 * 40, y, hof_cscore_color,
-		 hof_data[i]->name);
-		 }
+		if ((i == hof_change_index) && hof_edit) {
+			if (strlen(hof_data[i]->score) > 0) {
+				sdla_printf_tex(x, y, hof_cscore_color, hof_data[i]->score);
+				sdla_printf_tex(x + 5 * 40, y, hof_cscore_color,
+						hof_data[i]->name);
+			}
 
-		 } else {*/
-		sdla_printf_tex(x, y, hof_color, hof_data[i]->score);
-		sdla_printf_tex(x + 5 * 40, y, hof_color, hof_data[i]->name);
-		/*}*/
+		} else {
+			sdla_printf_tex(x, y, hof_color, hof_data[i]->score);
+			sdla_printf_tex(x + 5 * 40, y, hof_color, hof_data[i]->name);
+		}
 		y += 30;
 		i++;
 	}
