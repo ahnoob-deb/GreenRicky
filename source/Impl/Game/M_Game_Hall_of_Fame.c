@@ -218,6 +218,13 @@ static void read_highscore() {
 	int i = 0;
 
 	while ((fgets(line, MAX_LINE_LENGTH, f) != NULL) && (i < MAX_TOPS)) {
+
+		int last_char = strlen(line)-1;
+
+		/* Remove newline-char at end of line */
+		if (line[last_char]=='\n')
+			line[last_char]='\0';
+
 		no = 0;
 
 		token = strtok(line, HOF_DELIMITER);
