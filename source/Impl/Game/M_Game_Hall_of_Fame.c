@@ -17,6 +17,7 @@ static int hof_flag_fps;
 static HSCData *current_score = NULL;
 
 static int hof_edit;
+static int hof_save;
 static int hof_change_entry;
 static int hof_change_index;
 static int hof_letter_index;
@@ -33,7 +34,7 @@ static void hof_core_render(void);
 
 static void hof_init(unsigned int p_score);
 
-static void alloc_highscore_table(void);
+static void print_hof_table(void);
 
 static void read_highscore(void);
 
@@ -44,6 +45,28 @@ static void free_highscore_table(void);
 static void position_current_score(void);
 
 static void hof_insert_rank(int p_position, HSCData *p_data);
+
+static int hof_get_max_index(void);
+static void init_highscore_table(void);
+
+static int hof_get_max_index() {
+	int ret = 0;
+	int i = 0;
+	while ((hof_data[i] != NULL) && i < MAX_TOPS) {
+		i++;
+	}
+
+	if (i > 0)
+		ret = i - 1;
+	return ret;
+}
+
+static void print_hof_table() {
+	for (int i = 0; (i < MAX_TOPS) && (hof_data[i] != NULL); i++) {
+		printf("SCORE : %s, NAME : %s.\n", hof_data[i]->score,
+				hof_data[i]->name);
+	}
+}
 
 void hof_run(unsigned int p_score) {
 	hof_init(p_score);
@@ -58,31 +81,29 @@ static void hof_init(unsigned int p_score) {
 	hof_game_state = ST_HALL_OF_FAME;
 	hof_flag_fps = FALSE;
 	hof_edit = FALSE;
-	hof_score=p_score;
-    if (hof_score > 0)
+	hof_save = FALSE;
+	hof_score = p_score;
+	if (hof_score > 0) {
 		hof_edit = TRUE;
+		hof_save = TRUE;
+	}
 
-    printf("score is %d, hof_edit is %d.\n", hof_score, hof_edit);
+	printf("score is %d, hof_edit is %d.\n", hof_score, hof_edit);
 
-	alloc_highscore_table();
+	init_highscore_table();
+	printf("after init :\n");
+	print_hof_table();
 
 	read_highscore();
+
+	printf("after read :\n");
+	print_hof_table();
+
 }
 
-static void alloc_highscore_table() {
-
-	int i = 0;
-
-	for (i = 0; i < MAX_TOPS; i++) {
-
-		HSCData *data = calloc(1, sizeof(HSCData));
-
-		if (data == NULL) {
-			printf("could not allocate memory for highscore-table.");
-			quit_game_with_log_error("memory allocation error.", 1);
-		}
-
-		hof_data[i] = data;
+static void init_highscore_table() {
+	for (int i = 0; i < MAX_TOPS; i++) {
+		hof_data[i] = NULL;
 	}
 }
 
@@ -90,11 +111,13 @@ static void free_highscore_table() {
 
 	printf("free highscore table...\n");
 
-	int i = 0;
+	for (int i = 0; (i < MAX_TOPS) && (hof_data[i] != NULL); i++) {
 
-	for (i = 0; i < MAX_TOPS; i++) {
-
+		printf("free highscore of %s[%s].\n", hof_data[i]->name,
+				hof_data[i]->score);
 		free(hof_data[i]);
+		hof_data[i] = NULL;
+		printf("freed highscore.\n");
 	}
 }
 
@@ -117,6 +140,10 @@ static void hof_insert_rank(int p_position, HSCData *p_data) {
 
 static void save_highscore(void) {
 	printf("saving highscore...\n");
+
+	int max_index = hof_get_max_index();
+
+	printf("max index is: %d\n", max_index);
 
 	/*FILE *f = fopen(FILE_HOF, "w");
 
@@ -167,7 +194,7 @@ static void read_highscore() {
 	FILE *f = fopen(FILE_HOF, "r");
 
 	if (f == NULL) {
-		printf("could not open hof-file.");
+		printf("could not open hof.txt");
 		quit_game_with_log_error("data management error.", 1);
 	}
 
@@ -177,26 +204,39 @@ static void read_highscore() {
 
 	int i = 0;
 
-	do {
+	while ((fgets(line, MAX_LINE_LENGTH, f) != NULL) && (i < MAX_TOPS)) {
 		no = 0;
-		token = NULL;
 
-		if (fgets(line, MAX_LINE_LENGTH, f) != NULL) {
-			token = strtok(line, HOF_DELIMITER);
-			printf("\n");
-		}
+
+		token = strtok(line, HOF_DELIMITER);
+		printf("\n");
+
+
+		hof_data[i] = (HSCData*) calloc(1, sizeof(HSCData));
+
 		while (token != NULL) {
-			if (no == 0)
-				strcpy(hof_data[i]->score, token);
-			else if (no == 1)
-				strcpy(hof_data[i]->name, token);
+
+			if (hof_data[i] == NULL) {
+				printf("ERROR : ");
+				printf("memory allocation error at loading hall of fame.");
+				quit_game_with_log_error("memory allocation error", 1);
+			}
+
+			if (no == 0) {
+				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN);
+				printf("hof_data[%d]->score : %s\n", i, hof_data[i]->score);
+			} else if (no == 1) {
+				strncpy(hof_data[i]->name, token, MAX_NAME_LEN);
+				printf("hof_data[%d]->name : %s\n", i, hof_data[i]->name);
+			}
+			printf("added[%d] : [%s]\n", no, token);
 			token = strtok(NULL, HOF_DELIMITER);
 			no = !no;
 		}
 
 		i++;
-
-	} while (i < MAX_TOPS && strlen(line) > 0);
+        printf("%d\n",i);
+	}
 
 	fclose(f);
 }
@@ -205,10 +245,8 @@ int hof_get_game_state() {
 	return hof_game_state;
 }
 
-
 static void hof_main_loop() {
 	printf("entering hall of fame loop...");
-
 
 	printf("setting score %u\n", hof_score);
 
@@ -301,25 +339,23 @@ static void hof_core_render() {
 	int x = 80;
 	int y = 170;
 	unsigned int hof_color = HOF_COLOR;
-	unsigned int hof_cscore_color = HOF_CSCORE_COLOR;
+	//unsigned int hof_cscore_color = HOF_CSCORE_COLOR;
 
-	do {
-		if ((i == hof_change_index) && hof_edit) {
-			if (strlen(hof_data[i]->score) > 0) {
-				sdla_printf_tex(x, y, hof_cscore_color, hof_data[i]->score);
-				sdla_printf_tex(x + 5 * 40, y, hof_cscore_color,
-						hof_data[i]->name);
-			}
+	while (hof_data[i] != NULL && i < MAX_TOPS) {
+		/*	if ((i == hof_change_index) && hof_edit) {
+		 if (strlen(hof_data[i]->score) > 0) {
+		 sdla_printf_tex(x, y, hof_cscore_color, hof_data[i]->score);
+		 sdla_printf_tex(x + 5 * 40, y, hof_cscore_color,
+		 hof_data[i]->name);
+		 }
 
-		} else {
-			if (strlen(hof_data[i]->score) > 0) {
-				sdla_printf_tex(x, y, hof_color, hof_data[i]->score);
-				sdla_printf_tex(x + 5 * 40, y, hof_color, hof_data[i]->name);
-			}
-		}
+		 } else {*/
+		sdla_printf_tex(x, y, hof_color, hof_data[i]->score);
+		sdla_printf_tex(x + 5 * 40, y, hof_color, hof_data[i]->name);
+		/*}*/
 		y += 30;
 		i++;
-	} while (i < MAX_TOPS && strlen(hof_data[i]->score) > 0);
+	}
 
 	sdla_present_buffer();
 }
