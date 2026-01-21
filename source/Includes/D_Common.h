@@ -98,10 +98,12 @@
 /* The time span, where you can do a last move when
  hitting the ground.
  */
-#define LAST_MOVE_WAIT 300
+#define LAST_MOVE_WAIT 5000
 
 /* Lines implode after this time */
 #define IMPLODING_TIME 1200
+
+#define LIMIT_FPS TRUE
 
 /* where the playground starts
  #define GAMEAREA_STARTX 65
