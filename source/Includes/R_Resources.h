@@ -2,6 +2,16 @@
 #define R_RESOURCES_H 1
 
 #include "D_Common.h"
+#include "S_SDL3_Rendering.h"
+
+extern MyGameColor_t COL_WHITE;
+extern MyGameColor_t COL_LIGHTBLUE;
+extern MyGameColor_t COL_RED;
+extern MyGameColor_t COL_YELLOW;
+extern MyGameColor_t COL_PURPLE;
+extern MyGameColor_t COL_ORANGE;
+extern MyGameColor_t COL_GREEN;
+extern MyGameColor_t COL_BLUE;
 
 extern int MAP_SHAPE[MAP_WIDTH * MAP_HEIGHT];
 

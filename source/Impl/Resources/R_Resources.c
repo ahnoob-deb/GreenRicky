@@ -1,5 +1,24 @@
 #include "D_Common.h"
 #include "R_Resources.h"
+#include "S_SDL3_Rendering.h"
+
+/* WHITE : 0xFFFFFF */
+MyGameColor_t COL_WHITE={.R=0xFF, .G=0xFF, .B=0xFF, .A=0xFF};
+/* LIGHTBLUE : 0x62d2e9 */
+MyGameColor_t COL_LIGHTBLUE={.R=0x62, .G=0xD2, .B=0xE9, .A=0xFF};
+/* RED : 0xC42323 */
+MyGameColor_t COL_RED={.R=0xC4, .G=0x23, .B=0x23, .A=0xFF};
+/* RED : 0xf3cc21 */
+MyGameColor_t COL_YELLOW={.R=0xF3, .G=0xCC, .B=0x21, .A=0xFF};
+/* RED : 0xd12bbd */
+MyGameColor_t COL_PURPLE={.R=0xD1, .G=0x2B, .B=0xBD, .A=0xFF};
+/* RED : 0xee780f */
+MyGameColor_t COL_ORANGE={.R=0xEE, .G=0x78, .B=0x0F, .A=0xFF};
+/* RED : 0x187815 */
+MyGameColor_t COL_GREEN={.R=0x18, .G=0x78, .B=0x15, .A=0xFF};
+/* RED : 0x364dd4 */
+MyGameColor_t COL_BLUE={.R=0x36, .G=0x4D, .B=0xD4, .A=0xFF};
+
 
 int MAP_SHAPE[MAP_WIDTH * MAP_HEIGHT] = {
 
@@ -19,10 +38,10 @@ int MAP_SHAPE[MAP_WIDTH * MAP_HEIGHT] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
 };
 

@@ -88,7 +88,7 @@
 #define COUNT_SHAPES 7
 
 /* 5 MyGameColors are defined for the Pieces (for now). */
-#define COUNT_PIECE_COLORS 5
+#define COUNT_PIECE_COLORS 8
 
 /* 5 MyGameColors are defined for the map (for now). */
 #define COUNT_MAP_COLORS 6

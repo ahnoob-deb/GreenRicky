@@ -9,6 +9,7 @@
 #include "S_Logging.h"
 #include "S_Quit.h"
 #include "S_Texture_Manager.h"
+#include "R_Resources.h"
 
 
 static SDL_Renderer *renderer = NULL;
@@ -16,6 +17,7 @@ static SDL_Renderer *renderer = NULL;
 static SDL_Window *window = NULL;
 static MyGameColor_t piece_col[COUNT_PIECE_COLORS];
 static MyGameColor_t map_col[COUNT_MAP_COLORS];
+static MyGameColor_t imp_col[COUNT_IMP_COLORS];
 static void init_colors(void);
 
 /* Buffer size for debug strings */
@@ -52,30 +54,14 @@ void sdla_render_rect_from_tex(MyGameTexture_t *p_tex, float p_sx1, float p_sy1,
 
 static void init_colors() {
 
-	piece_col[0].R = 255;
-	piece_col[0].G = 255;
-	piece_col[0].B = 255;
-	piece_col[0].A = 33;
-
-	piece_col[1].R = 98;
-	piece_col[1].G = 40;
-	piece_col[1].B = 44;
-	piece_col[1].A = 0xFF;
-
-	piece_col[2].R = 55;
-	piece_col[2].G = 91;
-	piece_col[2].B = 47;
-	piece_col[2].A = 0xFF;
-
-	piece_col[3].R = 40;
-	piece_col[3].G = 75;
-	piece_col[3].B = 94;
-	piece_col[3].A = 0xFF;
-
-	piece_col[4].R = 90;
-	piece_col[4].G = 36;
-	piece_col[4].B = 91;
-	piece_col[4].A = 0xFF;
+	piece_col[0]=COL_WHITE;
+	piece_col[1]=COL_LIGHTBLUE;
+	piece_col[2]=COL_RED;
+	piece_col[3]=COL_YELLOW;
+	piece_col[4]=COL_PURPLE;
+	piece_col[5]=COL_ORANGE;
+	piece_col[6]=COL_GREEN;
+	piece_col[7]=COL_BLUE;
 
 	map_col[0].R = 0x33;
 	map_col[0].G = 0x7c;
@@ -108,14 +94,13 @@ static void init_colors() {
 	map_col[5].A = 0xFF;
 }
 
+
 void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
-		unsigned int p_col) {
+		MyGameColor_t *col) {
 
 	if (p_tex != NULL) {
 
 	SDL_FRect dst_rect;
-
-	unsigned int l_col = p_col % 5;
 
 	dst_rect.x = p_x;
 	dst_rect.y = p_y;
@@ -123,9 +108,9 @@ void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
 	dst_rect.h = (float) p_tex->height;
 
 	SDL_SetTextureBlendMode(p_tex->texture, SDL_BLENDMODE_BLEND );
-	SDL_SetTextureAlphaMod(p_tex->texture, piece_col[l_col].A);
-	SDL_SetTextureColorMod(p_tex->texture, piece_col[l_col].R,
-			piece_col[l_col].G, piece_col[l_col].B);
+	SDL_SetTextureAlphaMod(p_tex->texture, col->A);
+	SDL_SetTextureColorMod(p_tex->texture, col->R,
+			col->G, col->B);
 
 	SDL_RenderTexture(renderer, p_tex->texture, NULL, &dst_rect);
 	} else {
@@ -196,7 +181,17 @@ void sdla_draw_block_abs(size_t p_x, size_t p_y, size_t p_pm_x, size_t p_pm_y,
 	float drawy = p_pm_y * block_size;
 
 	sdla_render_texture_mod(gfx_piece_block01, p_x + drawx, p_y + drawy,
-			p_color);
+			&piece_col[p_color]);
+}
+
+void sdla_draw_imp_block(double p_x, double p_y, unsigned int p_color) {
+	int block_size = BLOCK_SIZE_PX;
+
+	float drawx = p_x * block_size;
+	float drawy = p_y * block_size;
+
+	sdla_render_texture_mod(gfx_piece_block01, DRAW_START_X + drawx,
+	DRAW_START_Y + drawy, &imp_col[p_color]);
 }
 
 void sdla_draw_block(double p_x, double p_y, unsigned int p_color) {
@@ -206,7 +201,7 @@ void sdla_draw_block(double p_x, double p_y, unsigned int p_color) {
 	float drawy = p_y * block_size;
 
 	sdla_render_texture_mod(gfx_piece_block01, DRAW_START_X + drawx,
-	DRAW_START_Y + drawy, p_color);
+	DRAW_START_Y + drawy, &piece_col[p_color]);
 }
 
 void sdla_draw_free(double p_x, double p_y, unsigned int p_color) {
@@ -216,7 +211,7 @@ void sdla_draw_free(double p_x, double p_y, unsigned int p_color) {
 	float drawy = p_y * block_size;
 
 	sdla_render_texture_mod(gfx_free_cell01, DRAW_START_X + drawx,
-	DRAW_START_Y + drawy, p_color);
+	DRAW_START_Y + drawy, &piece_col[p_color]);
 }
 
 int sdla_process_events() {

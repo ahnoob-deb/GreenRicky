@@ -12,6 +12,7 @@ typedef struct
     unsigned int rows_destroyed;
 } GameStats_t;
 
+
 /* booting the core game at startup,
  * this means, loading data etc.
  */
