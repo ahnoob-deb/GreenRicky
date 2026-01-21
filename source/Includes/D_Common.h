@@ -101,7 +101,7 @@
 #define LAST_MOVE_WAIT 300
 
 /* Lines implode after this time */
-#define IMPLODING_TIME 600
+#define IMPLODING_TIME 1200
 
 /* where the playground starts
  #define GAMEAREA_STARTX 65

@@ -13,6 +13,9 @@ extern MyGameColor_t COL_ORANGE;
 extern MyGameColor_t COL_GREEN;
 extern MyGameColor_t COL_BLUE;
 
+extern MyGameColor_t COL_IMP[];
+
+
 extern int MAP_SHAPE[MAP_WIDTH * MAP_HEIGHT];
 
 extern int SHAPE_T[COUNT_DIRECTIONS][PIECE_WIDTH * PIECE_HEIGHT];       

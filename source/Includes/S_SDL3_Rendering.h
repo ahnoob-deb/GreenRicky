@@ -22,7 +22,7 @@ int sdla_boot_mmAPI_SDL(void);
 int sdla_process_events(void);
 void sdla_clear_buffer(void);
 void sdla_present_buffer(void);
-void sdla_draw_imp_block(double p_x, double p_y, unsigned int p_color);
+void sdla_draw_imp(double p_x, double p_y, unsigned int p_color);
 void sdla_draw_block(double p_x, double p_y, unsigned int p_color);
 void sdla_draw_block_abs(size_t p_x, size_t p_y, size_t p_pm_x, size_t p_pm_y,
 		int p_color);

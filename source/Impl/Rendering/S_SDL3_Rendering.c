@@ -62,6 +62,10 @@ static void init_colors() {
 	piece_col[6]=COL_GREEN;
 	piece_col[7]=COL_BLUE;
 
+	imp_col[0]=COL_IMP[0];
+	imp_col[1]=COL_IMP[1];
+	imp_col[2]=COL_IMP[2];
+
 }
 
 
@@ -154,7 +158,7 @@ void sdla_draw_block_abs(size_t p_x, size_t p_y, size_t p_pm_x, size_t p_pm_y,
 			&piece_col[p_color]);
 }
 
-void sdla_draw_imp_block(double p_x, double p_y, unsigned int p_color) {
+void sdla_draw_imp(double p_x, double p_y, unsigned int p_color) {
 	int block_size = BLOCK_SIZE_PX;
 
 	float drawx = p_x * block_size;
