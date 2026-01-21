@@ -118,7 +118,7 @@
 /* The initial move-factor of a falling peace, following the factor when down-key is
  pressed. */
 #define NORM_MOVE_FACTOR 1
-#define MAX_MOVE_FACTOR 8
+#define MAX_MOVE_FACTOR 16
 
 /* Delay in milliseconds for waiting after Game Over */
 #define GAME_OVER_DELAY 3000
