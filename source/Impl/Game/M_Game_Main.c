@@ -763,8 +763,15 @@ static void cg_main_loop() {
 				cg_current_piece.ready_for_landing = 0;
 				gal_piece_move(&cg_current_piece, 0, fall_y);
 			}
-			/* but, if there is a collision below... */
+			/* but, if there was collision below... */
 			else {
+				// TODO : LOGIC FOR LAST MOVE HAS A BUG SOMETIMES
+				// BECAUSE THERE IS NO MORE COLLISION DETECTION HERE?!
+                // SO WE DO THAT HERE -> TEST, TEST, TEST
+				/* get new collision info before the last move. */
+				cg_collis_det_info = cg_collision_detection(
+						cg_current_piece.direction, fall_y);
+
 				/* if the Piece_t is already marked for parking */
 				if (cg_current_piece.ready_for_landing) {
 					/* check time gone since ready_for_landing */
@@ -773,7 +780,6 @@ static void cg_main_loop() {
 					time_gone = ((cg_moment_of_interest2
 							- cg_moment_of_interest1) / cg_freq) * SEC_UNIT;
 					printf("time_gone since collision below : %f\n", time_gone);
-					// TODO : LOGIC FOR LAST MOVE HAS A BUG SOMETIMES
 					/* if LAST_MOVE_WAIT ms are gone... */
 					if (time_gone > LAST_MOVE_WAIT) {
 						printf("waited %f ms.\n", time_gone);
