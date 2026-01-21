@@ -767,14 +767,13 @@ static void cg_main_loop() {
 			else {
 				/* if the Piece_t is already marked for parking */
 				if (cg_current_piece.ready_for_landing) {
-
 					/* check time gone since ready_for_landing */
 					cg_moment_of_interest2 = SDL_GetPerformanceCounter();
 
 					time_gone = ((cg_moment_of_interest2
 							- cg_moment_of_interest1) / cg_freq) * SEC_UNIT;
 					printf("time_gone since collision below : %f\n", time_gone);
-					// TODO : LOGIC FOR LAST MOVE IS WRONG
+					// TODO : LOGIC FOR LAST MOVE HAS A BUG SOMETIMES
 					/* if LAST_MOVE_WAIT ms are gone... */
 					if (time_gone > LAST_MOVE_WAIT) {
 						printf("waited %f ms.\n", time_gone);
