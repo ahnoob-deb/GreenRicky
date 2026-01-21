@@ -98,10 +98,10 @@
 /* The time span, where you can do a last move when
  hitting the ground.
  */
-#define LAST_MOVE_WAIT 5000
+#define LAST_MOVE_WAIT 500
 
 /* Lines implode after this time */
-#define IMPLODING_TIME 1200
+#define IMPLODING_TIME 1000
 
 #define LIMIT_FPS TRUE
 
