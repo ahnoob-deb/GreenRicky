@@ -16,7 +16,6 @@ static SDL_Renderer *renderer = NULL;
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
 static MyGameColor_t piece_col[COUNT_PIECE_COLORS];
-static MyGameColor_t map_col[COUNT_MAP_COLORS];
 static MyGameColor_t imp_col[COUNT_IMP_COLORS];
 static void init_colors(void);
 
@@ -63,35 +62,6 @@ static void init_colors() {
 	piece_col[6]=COL_GREEN;
 	piece_col[7]=COL_BLUE;
 
-	map_col[0].R = 0x33;
-	map_col[0].G = 0x7c;
-	map_col[0].B = 0x35;
-	map_col[0].A = 0xFF;
-
-	map_col[1].R = 27;
-	map_col[1].G = 30;
-	map_col[1].B = 25;
-	map_col[1].A = 0xFF;
-
-	map_col[2].R = 47;
-	map_col[2].G = 79;
-	map_col[2].B = 32;
-	map_col[2].A = 0xFF;
-
-	map_col[3].R = 32;
-	map_col[3].G = 46;
-	map_col[3].B = 79;
-	map_col[3].A = 0xFF;
-
-	map_col[4].R = 26;
-	map_col[4].G = 36;
-	map_col[4].B = 36;
-	map_col[4].A = 0xFF;
-
-	map_col[5].R = 0xFF;
-	map_col[5].G = 0xFF;
-	map_col[5].B = 0xFF;
-	map_col[5].A = 0xFF;
 }
 
 
