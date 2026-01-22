@@ -40,8 +40,10 @@
 
 #define BLOCK_SIZE_PX 20
 
-#define DRAW_START_X 291
-#define DRAW_START_Y 163
+// was 291 in draft 10
+#define DRAW_START_X 292
+// was 163 in draft 10
+#define DRAW_START_Y 157
 
 #define NEXT_PIECE_X 85
 #define NEXT_PIECE_Y 250
