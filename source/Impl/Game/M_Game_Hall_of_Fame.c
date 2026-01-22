@@ -85,7 +85,7 @@ static void hof_init(unsigned int p_score) {
 	hof_score = p_score;
 	if (hof_score > 0) {
 		hof_edit = TRUE;
-		hof_save = FALSE;
+		hof_save = TRUE;
 	}
 
 	printf("score is %d, hof_edit is %d.\n", hof_score, hof_edit);
@@ -150,12 +150,33 @@ static void save_highscore(void) {
 
 	if (hof_save) {
 
-		/*FILE *f = fopen(FILE_HOF, "w");
+		FILE *f = fopen(FILE_HOF, "w");
 
-		 fclose(f);*/
+		char line[MAX_LINE_LENGTH];
 
+		int i=0;
+
+		for (i=0;i<MAX_LINE_LENGTH;i++) {
+			line[i]=0;
+		}
+
+		i=0;
+
+		while((i<MAX_TOPS) && (hof_data[i]!=NULL)) {
+          strncpy(line,hof_data[i]->score, MAX_SCORE_LEN);
+          strncat(line, ";",2);
+          strncat(line,hof_data[i]->name, MAX_NAME_LEN);
+          printf("before last strncat\n");
+          if((i<MAX_TOPS-1) && (hof_data[i+1]!=NULL))
+        	  strncat(line, "\n",2);
+          printf("after last strncat\n");
+          printf("%c",line[0]);
+          fwrite(line,sizeof(char),strlen(line),f);
+          i++;
+		}
+        fclose(f);
 	} else {
-		printf("simulation of save :\n");
+		printf("WARNING : saving is disabled.\n");
 	}
 }
 

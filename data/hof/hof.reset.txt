@@ -2,4 +2,4 @@
 1000;kent
 999;briank
 800;noob
-666;Lord of Terror
+666;CrashBandicoot
