@@ -70,7 +70,7 @@ static void init_colors() {
 
 
 void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
-		MyGameColor_t *col) {
+		MyGameColor_t *col, int p_alpha) {
 
 	if (p_tex != NULL) {
 
@@ -82,7 +82,7 @@ void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
 	dst_rect.h = (float) p_tex->height;
 
 	SDL_SetTextureBlendMode(p_tex->texture, SDL_BLENDMODE_BLEND );
-	SDL_SetTextureAlphaMod(p_tex->texture, col->A);
+	SDL_SetTextureAlphaMod(p_tex->texture, p_alpha);
 	SDL_SetTextureColorMod(p_tex->texture, col->R,
 			col->G, col->B);
 
@@ -155,17 +155,17 @@ void sdla_draw_block_abs(size_t p_x, size_t p_y, size_t p_pm_x, size_t p_pm_y,
 	float drawy = p_pm_y * block_size;
 
 	sdla_render_texture_mod(gfx_piece_block01, p_x + drawx, p_y + drawy,
-			&piece_col[p_color]);
+			&piece_col[p_color],ALPHA_SOLID);
 }
 
-void sdla_draw_imp(double p_x, double p_y, unsigned int p_color) {
+void sdla_draw_imp(double p_x, double p_y, int imp_val, unsigned int p_alpha) {
 	int block_size = BLOCK_SIZE_PX;
 
 	float drawx = p_x * block_size;
 	float drawy = p_y * block_size;
 
 	sdla_render_texture_mod(gfx_piece_block01, DRAW_START_X + drawx,
-	DRAW_START_Y + drawy, &imp_col[p_color]);
+	DRAW_START_Y + drawy, &imp_col[imp_val], p_alpha);
 }
 
 void sdla_draw_block(double p_x, double p_y, unsigned int p_color) {
@@ -175,7 +175,7 @@ void sdla_draw_block(double p_x, double p_y, unsigned int p_color) {
 	float drawy = p_y * block_size;
 
 	sdla_render_texture_mod(gfx_piece_block01, DRAW_START_X + drawx,
-	DRAW_START_Y + drawy, &piece_col[p_color]);
+	DRAW_START_Y + drawy, &piece_col[p_color], ALPHA_SOLID);
 }
 
 void sdla_draw_free(double p_x, double p_y, unsigned int p_color) {
@@ -185,7 +185,7 @@ void sdla_draw_free(double p_x, double p_y, unsigned int p_color) {
 	float drawy = p_y * block_size;
 
 	sdla_render_texture_mod(gfx_free_cell01, DRAW_START_X + drawx,
-	DRAW_START_Y + drawy, &piece_col[p_color]);
+	DRAW_START_Y + drawy, &piece_col[p_color], ALPHA_SOLID);
 }
 
 int sdla_process_events() {

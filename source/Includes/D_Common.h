@@ -120,6 +120,8 @@
 #define NORM_MOVE_FACTOR 1
 #define MAX_MOVE_FACTOR 16
 
+#define ALPHA_SOLID 255
+
 /* Delay in milliseconds for waiting after Game Over */
 #define GAME_OVER_DELAY 3000
 

@@ -104,7 +104,7 @@ static int cg_full_lines_index;
 /* time in ms since the full line has been marked for implode */
 
 static int tow;
-static int impcolor;
+static int impalpha;
 
 /***************************************************/
 /* Event management.                               */
@@ -212,7 +212,7 @@ static int cg_init() {
 
 	/* init timer for imploding full lines and its color */
 	tow = 0;
-	impcolor = 0;
+	impalpha = ALPHA_SOLID;
 
 	/* reset statistics */
 	cg_stats.count_pieces_landed = 0;
@@ -291,6 +291,7 @@ static void cg_map_render(MapData_t *p_map) {
 
 	int drawx = 0;
 	int drawy = 0;
+	int percent=0;
 
 	for (drawy = 0; drawy < MAP_HEIGHT; drawy++) {
 		for (drawx = 0; drawx < MAP_WIDTH; drawx++) {
@@ -304,13 +305,10 @@ static void cg_map_render(MapData_t *p_map) {
 				sdla_draw_free(p_map->x + drawx, p_map->y + drawy,
 						p_map->color);
 			} else if (value_of_matrix == IMPLODING) {
-				impcolor = 0;
-				if (tow >= (IMPLODING_TIME * 2 / 3))
-					impcolor = 2;
-				else if (tow >= (IMPLODING_TIME / 3))
-					impcolor = 1;
-				printf("IMPLODING COLOR : %d\n", impcolor);
-				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, impcolor);
+				percent=tow/(IMPLODING_TIME/100);
+				impalpha=ALPHA_SOLID-((ALPHA_SOLID/100)*percent);
+				printf("ALPHA : %d\n", impalpha);
+				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, 0, impalpha);
 			}
 		}
 	}
