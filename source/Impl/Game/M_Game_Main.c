@@ -102,9 +102,9 @@ static void cg_map_tumble_lines(unsigned int p_above_y);
 static int cg_full_lines[MAX_FULL_LINES];
 static int cg_full_lines_index;
 /* time in ms since the full line has been marked for implode */
+static int cg_toi;
+static int cg_impalpha;
 
-static int tow;
-static int impalpha;
 
 /***************************************************/
 /* Event management.                               */
@@ -153,9 +153,6 @@ static double cg_elapsed_time();
 /* old time of measure of the fall of the Piece_t */
 static double cg_fall_mea_old_time;
 
-/* for time measurements where it is needed */
-static double cg_moment_of_interest1;
-static double cg_moment_of_interest2;
 
 /***************************************************/
 /* FPS DATA                                        */
@@ -165,7 +162,6 @@ static int cg_fps = 0;
 static double cg_frametime_ms_shown = 0.0f;
 static unsigned int cg_frame = 0;
 static unsigned int cg_target_fps = TARGET_FPS;
-static int cg_limit_fps_flag = LIMIT_FPS;
 
 void cg_limit_fps(void);
 void cg_calc_fps(void);
@@ -211,8 +207,8 @@ static int cg_init() {
 	cg_fall_mea_old_time = cg_start;
 
 	/* init timer for imploding full lines and its color */
-	tow = 0;
-	impalpha = ALPHA_SOLID;
+	cg_toi = 0;
+	cg_impalpha = ALPHA_SOLID;
 
 	/* reset statistics */
 	cg_stats.count_pieces_landed = 0;
@@ -223,8 +219,8 @@ static int cg_init() {
 	cg_collis_det_info = 0;
 
 	/* reset time measurement variables */
-	cg_moment_of_interest1 = SDL_GetPerformanceCounter();
-	cg_moment_of_interest2 = cg_moment_of_interest1;
+	//cg_moment_of_interest1 = SDL_GetPerformanceCounter();
+	//cg_moment_of_interest2 = cg_moment_of_interest1;
 
 	/* game is not over yet */
 	cg_game_over_flag = 0;
@@ -305,10 +301,10 @@ static void cg_map_render(MapData_t *p_map) {
 				sdla_draw_free(p_map->x + drawx, p_map->y + drawy,
 						p_map->color);
 			} else if (value_of_matrix == IMPLODING) {
-				percent=tow/(IMPLODING_TIME/100);
-				impalpha=ALPHA_SOLID-((ALPHA_SOLID/100)*percent);
-				printf("ALPHA : %d\n", impalpha);
-				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, 0, impalpha);
+				percent=cg_toi/(IMPLODING_TIME/100);
+				cg_impalpha=ALPHA_SOLID-((ALPHA_SOLID/100)*percent);
+				printf("ALPHA : %d\n", cg_impalpha);
+				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, 0, cg_impalpha);
 			}
 		}
 	}
@@ -491,6 +487,9 @@ static void cg_check_full_lines() {
 	size_t x = 0;
 	size_t y = 0;
 
+	/* for time measurements where it is needed */
+	//double moment_of_interest1;
+
 	for (y = 0; y < cg_map_data.height; y++) {
 		unsigned short line_is_full = 1;
 		for (x = 0; x < cg_map_data.width; x++) {
@@ -500,7 +499,7 @@ static void cg_check_full_lines() {
 			}
 		}
 		if (line_is_full) {
-			cg_moment_of_interest1 = SDL_GetPerformanceCounter();
+			//moment_of_interest1 = SDL_GetPerformanceCounter();
 			cg_let_line_fade(y);
 			cg_full_lines[cg_full_lines_index] = y;
 			cg_full_lines_index++;
@@ -612,15 +611,6 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 	pce->moveable = 1;
 	pce->display = 1;
 
-	/* new collision detection please, because ... */
-	cg_collis_det_info = cg_collision_detection(cg_current_piece.direction,
-			0.0f);
-
-	/* if the new Piece_t collides already at startup
-	 it's game over. */
-	if ((cg_collis_det_info & COLL_BELOW) == COLL_BELOW) {
-		cg_game_over_flag = 1;
-	}
 }
 
 static void cg_switch_next_piece() {
@@ -726,6 +716,13 @@ static void cg_main_loop() {
 	double time_gone = 0;
 	double fall_y = 0;
 
+	int limit_fps_flag = LIMIT_FPS;
+
+	/* for time measurements where it is needed */
+	double moment_of_interest1=SDL_GetPerformanceCounter();
+	double moment_of_interest2=moment_of_interest1;
+
+
 	printf("entering core loop...\n");
 	printf("game state is : %d\n", cg_game_state);
 
@@ -734,7 +731,7 @@ static void cg_main_loop() {
 
 		cg_frame++;
 		cg_calc_fps();
-		if (cg_limit_fps_flag) {
+		if (limit_fps_flag) {
 			cg_limit_fps();
 		}
 
@@ -751,19 +748,19 @@ static void cg_main_loop() {
 			/* if there are full lines to destroy ... */
 			if (cg_found_full_lines()) {
 				/* and the doom-timer till markup of line(s) is over... */
-				tow = ((SDL_GetPerformanceCounter() - cg_moment_of_interest1)
+				cg_toi = ((SDL_GetPerformanceCounter() - moment_of_interest1)
 						/ cg_freq) * SEC_UNIT;
-				printf("TOW : %d\n", tow);
-				if (tow >= IMPLODING_TIME)
+				printf("TOW : %d\n", cg_toi);
+				if (cg_toi >= IMPLODING_TIME)
 					/* ... let them implode. */
 					cg_implode_full_lines();
 			}
 
+			/* calc the collision info */
 			fall_y = cg_calc_fall(cg_move_factor);
-
-			/* is there a collision of the Piece_t? */
 			cg_collis_det_info = cg_collision_detection(
 					cg_current_piece.direction, fall_y);
+
 
 			/* if there is no collision below : move the Piece_t down... */
 			if ((cg_collis_det_info & COLL_BELOW) != COLL_BELOW) {
@@ -782,10 +779,10 @@ static void cg_main_loop() {
 				/* if the Piece_t is already marked for parking */
 				if (cg_current_piece.ready_for_landing) {
 					/* check time gone since ready_for_landing */
-					cg_moment_of_interest2 = SDL_GetPerformanceCounter();
+					moment_of_interest2 = SDL_GetPerformanceCounter();
 
-					time_gone = ((cg_moment_of_interest2
-							- cg_moment_of_interest1) / cg_freq) * SEC_UNIT;
+					time_gone = ((moment_of_interest2
+							- moment_of_interest1) / cg_freq) * SEC_UNIT;
 					printf("time_gone since collision below : %f\n", time_gone);
 					/* if LAST_MOVE_WAIT ms are gone... */
 					if (time_gone > LAST_MOVE_WAIT) {
@@ -807,7 +804,7 @@ static void cg_main_loop() {
 					cg_current_piece.ready_for_landing = 1;
 					/* and measure the time - from now on
 					 we have to wait LAST_MOVE_WAIT ms */
-					cg_moment_of_interest1 = SDL_GetPerformanceCounter();
+					moment_of_interest1 = SDL_GetPerformanceCounter();
 				}
 			}
 			/* render all. */
