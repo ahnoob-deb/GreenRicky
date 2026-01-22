@@ -143,6 +143,6 @@
 #define HOF_CSCORE_COLOR 0xe37a56
 
 
-#define START_SCORE 333
+#define START_SCORE 0
 
 #endif

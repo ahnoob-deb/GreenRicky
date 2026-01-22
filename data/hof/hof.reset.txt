@@ -3,3 +3,4 @@
 999;briank
 800;noob
 666;CrashBandicoot
+50;Gameover
