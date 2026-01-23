@@ -865,12 +865,12 @@ static void cg_render_next_piece() {
 /* simply renders the current statistics to screen. */
 static void cg_render_stats() {
 	/* rows */
-	sdla_printf(580, 310, 5, "Rows destroyed : %d", cg_stats.rows_destroyed);
+	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5, "Rows destroyed : %d", cg_stats.rows_destroyed);
 	/* rows */
-	sdla_printf(580, 350, 5, "Pieces landed  : %d",
+	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+STATISTICS_LINE_SPACING, 5, "Pieces landed  : %d",
 			cg_stats.count_pieces_landed);
 	/* score */
-	sdla_printf(580, 390, 5, "Total Score    : %d", cg_stats.score);
+	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+2*STATISTICS_LINE_SPACING, 5, "Total Score    : %d", cg_stats.score);
 }
 
 /* Here, the state of the core game will be drawn to screen */

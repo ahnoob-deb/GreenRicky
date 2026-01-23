@@ -45,8 +45,16 @@
 // was 163 in draft 10
 #define DRAW_START_Y 156
 
-#define NEXT_PIECE_X 85
-#define NEXT_PIECE_Y 250
+#define DRAW_STATISTICS_START_X 567
+#define DRAW_STATISTICS_START_Y 295
+#define STATISTICS_LINE_SPACING 40
+
+/* was 85 in draft 11 */
+#define NEXT_PIECE_X 96
+/* was 250 in draft 11 */
+#define NEXT_PIECE_Y 254
+
+
 
 /* where is no bricket... > FREE = bricket */
 #define FREE 0
