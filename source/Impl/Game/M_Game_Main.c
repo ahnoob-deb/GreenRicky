@@ -84,6 +84,8 @@ static double cg_calc_fall(int p_move_factor);
 /* move factor of the falling Piece_t */
 static int cg_move_factor;
 
+static double cg_current_speed;
+
 static void cg_switch_next_piece();
 
 /***************************************************/
@@ -226,6 +228,8 @@ static int cg_init() {
 	cg_game_over_flag = 0;
 
 	cg_move_factor = NORM_MOVE_FACTOR;
+	cg_current_speed=PIECE_FALL_PER_SECOND;
+
 
 	/* reset the array of full lines */
 	cg_clear_full_lines();
@@ -461,7 +465,7 @@ static double cg_calc_fall(int p_move_factor) {
 	double second_fraction = (double) (current_time - cg_fall_mea_old_time);
 	/* calculate the value of incrementing y */
 	double fall_y_axis = p_move_factor *
-	PIECE_FALL_PER_SECOND * second_fraction;
+	cg_current_speed * second_fraction;
 
 	/* save time of last measure */
 	cg_fall_mea_old_time = current_time;
@@ -723,6 +727,8 @@ static void cg_main_loop() {
 	double moment_of_interest2=moment_of_interest1;
 
 
+	int reset_factor=NORM_MOVE_FACTOR;
+
 	printf("entering core loop...\n");
 	printf("game state is : %d\n", cg_game_state);
 
@@ -740,6 +746,8 @@ static void cg_main_loop() {
 
 		/* if not game over ... */
 		if (!cg_game_over_flag) {
+
+			cg_move_factor = reset_factor;
 
 			/* check keys pressed and dispatch the delivered events */
 			/* ignore the keycode, its not needed here. */
@@ -796,6 +804,14 @@ static void cg_main_loop() {
 
 						/* then, switch to the next Piece_t. */
 						cg_switch_next_piece();
+
+						if (cg_stats.score>LEVEL_BORDER1)
+							cg_current_speed=L2_FALL_PER_SECOND;
+						if (cg_stats.score>LEVEL_BORDER2)
+							cg_current_speed=L3_FALL_PER_SECOND;
+						if (cg_stats.score>LEVEL_BORDER3)
+							cg_current_speed=L4_FALL_PER_SECOND;
+
 					}
 				}
 				/* if the Piece_t is not yet marked for landing but collides... */
@@ -883,8 +899,6 @@ static void cg_core_render() {
 
 /* dispatch the events, delivered by the SDL3-Keyboard-Scan */
 static void cg_dispatch_core_events(int p_ev) {
-
-	cg_move_factor = NORM_MOVE_FACTOR;
 
 	if (p_ev != EV_NO_EVENT) {
 

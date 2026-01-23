@@ -41,9 +41,9 @@
 #define BLOCK_SIZE_PX 20
 
 // was 291 in draft 10
-#define DRAW_START_X 292
+#define DRAW_START_X 291
 // was 163 in draft 10
-#define DRAW_START_Y 157
+#define DRAW_START_Y 156
 
 #define NEXT_PIECE_X 85
 #define NEXT_PIECE_Y 250
@@ -114,8 +114,15 @@
 /* Exit key is ESCAPE key (27 in ASCII) */
 #define K_EXIT K_ESCAPE
 
+#define LEVEL_BORDER1 500
+#define LEVEL_BORDER2 1000
+#define LEVEL_BORDER3 1500
+
 /* Piece falling with 1.5 Pixels per Second */
 #define PIECE_FALL_PER_SECOND 3.0f
+#define L2_FALL_PER_SECOND 4.0f
+#define L3_FALL_PER_SECOND 5.0f
+#define L4_FALL_PER_SECOND 6.0f
 
 /* The initial move-factor of a falling peace, following the factor when down-key is
  pressed. */
