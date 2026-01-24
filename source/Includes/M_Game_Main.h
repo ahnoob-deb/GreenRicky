@@ -10,6 +10,7 @@ typedef struct
     unsigned int score;
     unsigned int count_pieces_landed;
     unsigned int rows_destroyed;
+    unsigned int level;
 } GameStats_t;
 
 

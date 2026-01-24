@@ -216,6 +216,7 @@ static int cg_init() {
 	cg_stats.count_pieces_landed = 0;
 	cg_stats.rows_destroyed = 0;
 	cg_stats.score = START_SCORE;
+	cg_stats.level = 1;
 
 	/* reset all bits of collision detection */
 	cg_collis_det_info = 0;
@@ -805,12 +806,18 @@ static void cg_main_loop() {
 						/* then, switch to the next Piece_t. */
 						cg_switch_next_piece();
 
-						if (cg_stats.score>LEVEL_BORDER1)
+						if (cg_stats.score>LEVEL_BORDER1) {
 							cg_current_speed=L2_FALL_PER_SECOND;
-						if (cg_stats.score>LEVEL_BORDER2)
+							cg_stats.level=2;
+						}
+						if (cg_stats.score>LEVEL_BORDER2) {
 							cg_current_speed=L3_FALL_PER_SECOND;
-						if (cg_stats.score>LEVEL_BORDER3)
+							cg_stats.level=3;
+						}
+						if (cg_stats.score>LEVEL_BORDER3) {
 							cg_current_speed=L4_FALL_PER_SECOND;
+							cg_stats.level=4;
+						}
 
 					}
 				}
@@ -871,6 +878,8 @@ static void cg_render_stats() {
 			cg_stats.count_pieces_landed);
 	/* score */
 	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+2*STATISTICS_LINE_SPACING, 5, "Total Score    : %d", cg_stats.score);
+	/* level */
+	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+3*STATISTICS_LINE_SPACING, 5, "Level          : %d", cg_stats.level);
 }
 
 /* Here, the state of the core game will be drawn to screen */
