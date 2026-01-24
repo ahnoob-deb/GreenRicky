@@ -17,6 +17,7 @@ int gfx_init_hooks(void);
 void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
 		MyGameColor_t *col, int p_alpha);
 void sdla_render_texture(MyGameTexture_t *p_tex, float p_x, float p_y);
+SDL_Window* sdla_get_window(void);
 SDL_Renderer* sdla_get_renderer(void);
 int sdla_boot_mmAPI_SDL(void);
 int sdla_process_events(void);

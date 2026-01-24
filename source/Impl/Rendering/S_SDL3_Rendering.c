@@ -34,6 +34,12 @@ SDL_Renderer* sdla_get_renderer() {
 	return renderer;
 }
 
+/* returns the used renderer */
+SDL_Window* sdla_get_window() {
+	return window;
+}
+
+
 void sdla_render_rect_from_tex(MyGameTexture_t *p_tex, float p_sx1, float p_sy1,
 		float p_sx2, float p_sy2, float p_dx1, float p_dy1, float p_dx2,
 		float p_dy2) {
