@@ -4,8 +4,8 @@ CC := gcc
 AR := ar
 SOURCE=../source
 
-# DEBUG, OPTIMIZE2 or OPTIMIZE3
-MODE := DEBUG
+# DEBUG, DEBUG-ASAN, OPTIMIZE2 or OPTIMIZE3
+MODE := DEBUG-ASAN
 
 # Quell- und Header-Dateien automatisch finden
 SRC := $(shell find $(SOURCE)/Impl -name '*.c')
@@ -18,6 +18,9 @@ CFLAGS += -Wmissing-prototypes -Werror=missing-prototypes
 LFLAGS := -lSDL3 -lSDL3_image -lm 
 
 ifeq ($(MODE), DEBUG)
+	CFLAGS += -g -pg -DDEBUG
+	LFLAGS += -g -pg
+else ifeq ($(MODE), DEBUG-ASAN)
 	CFLAGS += -g -pg -DDEBUG
 	CFLAGS += -fsanitize=address
 	LFLAGS += -g -pg

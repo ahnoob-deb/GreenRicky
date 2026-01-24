@@ -42,7 +42,7 @@ typedef struct MyGameTexture
 
 } MyGameTexture_t;
 
-int mt_load_texture_with_id(char *p_filename, char *p_tex_hook_id,MyGameTexture_t **p_hook);
+int mt_load_texture(char *p_filename, char *p_tex_hook_id,MyGameTexture_t **p_hook);
 MyGameTexture_t *mt_add_texture(char p_id[], SDL_Texture *p_tex, int p_width, int p_height);
 MyGameTexture_t *mt_search_texture(char p_id[]);
 

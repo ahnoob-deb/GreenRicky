@@ -37,7 +37,7 @@ static void mg_quit(void);
 static int mg_load_textures() {
 	/* FONTS : */
 
-	mt_load_texture_with_id(FILE_FONT_DATA_01, HOOK_FONT_DATA_01, NULL);
+	mt_load_texture(FILE_FONT_DATA_01, HOOK_FONT_DATA_01, NULL);
 
 	if (mt_search_texture(HOOK_FONT_DATA_01) == NULL) {
 		printf("could not load fonts!\n");
@@ -46,9 +46,9 @@ static int mg_load_textures() {
 
 	/* MAIN MENU : */
 
-	mt_load_texture_with_id(FILE_MMENU_SCREEN_MASK_OFF, HOOK_MMENU_SCREEN_MASK_OFF,
+	mt_load_texture(FILE_MMENU_SCREEN_MASK_OFF, HOOK_MMENU_SCREEN_MASK_OFF,
 	NULL);
-	mt_load_texture_with_id(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
+	mt_load_texture(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
 
 	if ((mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF) == NULL)
 			|| (mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON) == NULL)) {
@@ -58,7 +58,7 @@ static int mg_load_textures() {
 
 	/* HALL OF FAME : */
 
-	mt_load_texture_with_id(FILE_HOF_SCREEN_MASK, HOOK_HOF_SCREEN_MASK, NULL);
+	mt_load_texture(FILE_HOF_SCREEN_MASK, HOOK_HOF_SCREEN_MASK, NULL);
 
 	if (mt_search_texture(HOOK_HOF_SCREEN_MASK) == NULL) {
 		printf("could not load textures for hall of fame!\n");
@@ -67,9 +67,9 @@ static int mg_load_textures() {
 
 	/* INGAME : */
 
-	mt_load_texture_with_id(FILE_INGAME_SCREEN_MASK, HOOK_INGAME_SCREEN_MASK, NULL);
-	mt_load_texture_with_id(FILE_CELL_BLOCK_MASK, HOOK_CELL_BLOCK_MASK, NULL);
-	mt_load_texture_with_id(FILE_CELL_FREE_MASK, HOOK_CELL_FREE_MASK, NULL);
+	mt_load_texture(FILE_INGAME_SCREEN_MASK, HOOK_INGAME_SCREEN_MASK, NULL);
+	mt_load_texture(FILE_CELL_BLOCK_MASK, HOOK_CELL_BLOCK_MASK, NULL);
+	mt_load_texture(FILE_CELL_FREE_MASK, HOOK_CELL_FREE_MASK, NULL);
 
 	if ((mt_search_texture(HOOK_INGAME_SCREEN_MASK) == NULL)
 			|| (mt_search_texture(HOOK_CELL_BLOCK_MASK) == NULL)
@@ -80,7 +80,7 @@ static int mg_load_textures() {
 
 	/* ALPHA INGAME */
 
-	mt_load_texture_with_id(FILE_CELL_BLOCK_MASK_ALPHA, HOOK_CELL_BLOCK_MASK_ALPHA,
+	mt_load_texture(FILE_CELL_BLOCK_MASK_ALPHA, HOOK_CELL_BLOCK_MASK_ALPHA,
 			NULL);
 
 	return TRUE;

@@ -52,7 +52,7 @@ static void init_highscore_table(void);
 static int hof_get_max_index() {
 	int ret = 0;
 	int i = 0;
-	while ((hof_data[i] != NULL) && i < MAX_TOPS) {
+	while ((i < MAX_TOPS) && (hof_data[i] != NULL)) {
 		i++;
 	}
 
@@ -122,22 +122,26 @@ static void free_highscore_table() {
 }
 
 static void hof_insert_rank(int p_position, HSCData *p_data) {
+	if (p_data != NULL) {
+		printf("inserting %s[%s] at index %d.\n", p_data->name, p_data->score,
+				p_position);
 
-	printf("inserting %s[%s] at index %d.\n", p_data->name, p_data->score,
-			p_position);
+		HSCData *temp = NULL;
 
-	HSCData *temp = NULL;
+		if (p_position < MAX_TOPS - 1) {
 
-	if (p_position < MAX_TOPS - 1) {
+			temp = hof_data[p_position];
+			if (temp != NULL)
+				hof_insert_rank(p_position + 1, temp);
 
-		temp = hof_data[p_position];
-		if (temp != NULL)
-			hof_insert_rank(p_position + 1, temp);
-
-		hof_data[p_position] = p_data;
+			hof_data[p_position] = p_data;
+		} else {
+			if (hof_data[p_position] != NULL)
+				free(hof_data[p_position]);
+			hof_data[p_position] = p_data;
+		}
 	} else {
-		free(hof_data[p_position]);
-		hof_data[p_position] = p_data;
+		quit_game_with_log_error("ERROR : p_data is NULL!", 1);
 	}
 }
 
@@ -154,27 +158,27 @@ static void save_highscore(void) {
 
 		char line[MAX_LINE_LENGTH];
 
-		int i=0;
+		int i = 0;
 
-		for (i=0;i<MAX_LINE_LENGTH;i++) {
-			line[i]=0;
+		for (i = 0; i < MAX_LINE_LENGTH; i++) {
+			line[i] = 0;
 		}
 
-		i=0;
+		i = 0;
 
-		while((i<MAX_TOPS) && (hof_data[i]!=NULL)) {
-          strncpy(line,hof_data[i]->score, MAX_SCORE_LEN);
-          strncat(line, ";",2);
-          strncat(line,hof_data[i]->name, MAX_NAME_LEN);
-          printf("before last strncat\n");
-          if((i<MAX_TOPS-1) && (hof_data[i+1]!=NULL))
-        	  strncat(line, "\n",2);
-          printf("after last strncat\n");
-          printf("%c",line[0]);
-          fwrite(line,sizeof(char),strlen(line),f);
-          i++;
+		while ((i < MAX_TOPS) && (hof_data[i] != NULL)) {
+			strncpy(line, hof_data[i]->score, MAX_SCORE_LEN);
+			strncat(line, ";", 2);
+			strncat(line, hof_data[i]->name, MAX_NAME_LEN);
+			printf("before last strncat\n");
+			if ((i < MAX_TOPS - 1) && (hof_data[i + 1] != NULL))
+				strncat(line, "\n", 2);
+			printf("after last strncat\n");
+			printf("%c", line[0]);
+			fwrite(line, sizeof(char), strlen(line), f);
+			i++;
 		}
-        fclose(f);
+		fclose(f);
 	} else {
 		printf("WARNING : saving is disabled.\n");
 	}
@@ -218,7 +222,7 @@ static void position_current_score() {
 
 		printf("you reached place : %d\n", hof_change_index + 1);
 
-		if ((found_place) && (i < MAX_TOPS)) {
+		if ((i < MAX_TOPS) && (found_place)) {
 			printf("found place - place new highscore.\n");
 
 			hof_insert_rank(i, current_score);
@@ -240,7 +244,7 @@ static void read_highscore() {
 
 	int i = 0;
 
-	while ((fgets(line, MAX_LINE_LENGTH, f) != NULL) && (i < MAX_TOPS)) {
+	while ((i < MAX_TOPS) && (fgets(line, MAX_LINE_LENGTH, f) != NULL)) {
 
 		int last_char = strlen(line) - 1;
 
@@ -264,10 +268,10 @@ static void read_highscore() {
 			}
 
 			if (no == 0) {
-				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN-1);
+				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN - 1);
 				printf("hof_data[%d]->score : %s\n", i, hof_data[i]->score);
 			} else if (no == 1) {
-				strncpy(hof_data[i]->name, token, MAX_NAME_LEN-1);
+				strncpy(hof_data[i]->name, token, MAX_NAME_LEN - 1);
 				printf("hof_data[%d]->name : %s\n", i, hof_data[i]->name);
 			}
 			printf("added[%d] : [%s]\n", no, token);
@@ -387,7 +391,7 @@ static void hof_core_render() {
 	unsigned int hof_color = HOF_COLOR;
 	unsigned int hof_cscore_color = HOF_CSCORE_COLOR;
 
-	while (hof_data[i] != NULL && i < MAX_TOPS) {
+	while ((i < MAX_TOPS) && (hof_data[i] != NULL)) {
 		if ((i == hof_change_index) && hof_edit) {
 			if (strlen(hof_data[i]->score) > 0) {
 				sdla_printf_tex(x, y, hof_cscore_color, hof_data[i]->score);

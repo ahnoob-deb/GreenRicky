@@ -19,13 +19,13 @@ static MyGameTexture_t *mt_in_alloc_texture(void);
 static MyGameTexture_t *mt_in_add_texture(MyGameTexture_t *p_node, char p_id[], SDL_Texture *p_tex, int p_width, int p_height);
 static MyGameTexture_t *mt_in_search_texture(MyGameTexture_t *p_node, char p_id[]);
 static void mt_in_tree_textures_destroy(MyGameTexture_t *p_node);
-static int mt_in_load_texture(char *p_filename, MyGameTexture_t **p_hook);
+//static int mt_in_load_texture(char *p_filename, MyGameTexture_t **p_hook);
 
 void mt_init() {
 	renderer=sdla_get_renderer();
 }
 
-int mt_load_texture_with_id(char *p_filename, char *p_tex_hook_id,
+int mt_load_texture(char *p_filename, char *p_tex_hook_id,
 		MyGameTexture_t **p_hook) {
 	SDL_Surface *surface = NULL;
 	char *bmp_path = NULL;
@@ -78,19 +78,19 @@ int mt_load_texture_with_id(char *p_filename, char *p_tex_hook_id,
 
 	return TRUE;
 }
-
+/*
 static int mt_in_load_texture(char *p_filename, MyGameTexture_t **p_hook)
 {
     SDL_Surface *surface = NULL;
     char *bmp_path = NULL;
 
-    /* Textures are pixel data that we upload to the video hardware for fast drawing. Lots of 2D
-       engines refer to these as "sprites." We'll do a static MyGameTexture_t (upload once, draw many
-       times) with data from a bitmap file. */
+    // Textures are pixel data that we upload to the video hardware for fast drawing. Lots of 2D
+    // engines refer to these as "sprites." We'll do a static MyGameTexture_t (upload once, draw many
+    //   times) with data from a bitmap file.
 
-    /* SDL_Surface is pixel data the CPU can access. SDL_Texture is pixel data the GPU can access.
-       Load a .bmp into a surface, move it to a MyGameTexture_t from there. */
-    SDL_asprintf(&bmp_path, "%s%s%s", SDL_GetBasePath(), "../data/images/", p_filename); /* allocate a string of the full file path */
+    // SDL_Surface is pixel data the CPU can access. SDL_Texture is pixel data the GPU can access.
+    // Load a .bmp into a surface, move it to a MyGameTexture_t from there.
+    SDL_asprintf(&bmp_path, "%s%s%s", SDL_GetBasePath(), "../data/images/", p_filename); // allocate a string of the full file path
 
     surface = IMG_Load(bmp_path);
     SDL_free(bmp_path); // done with this, the file is loaded.
@@ -134,7 +134,7 @@ static int mt_in_load_texture(char *p_filename, MyGameTexture_t **p_hook)
     }
 
     return TRUE;
-}
+}*/
 
 static MyGameTexture_t *mt_in_alloc_texture()
 {
@@ -250,7 +250,7 @@ MyGameTexture_t *mt_add_texture(char p_id[], SDL_Texture *p_tex, int p_width, in
     {
 
         printf("Could not find %s, trying to load from disk...\n", p_id);
-        mt_in_load_texture(p_id, &ret);
+        mt_load_texture(p_id, p_id, &ret);
 
         if (ret == NULL)
         {
