@@ -25,6 +25,60 @@ void mt_init() {
 	renderer=sdla_get_renderer();
 }
 
+int mt_load_texture_with_id(char *p_filename, char *p_tex_hook_id,
+		MyGameTexture_t **p_hook) {
+	SDL_Surface *surface = NULL;
+	char *bmp_path = NULL;
+
+	// Textures are pixel data that we upload to the video hardware for fast drawing. Lots of 2D
+	// engines refer to these as "sprites." We'll do a static MyGameTexture (upload once, draw many
+	// times) with data from a bitmap file.
+
+	// SDL_Surface is pixel data the CPU can access. SDL_Texture is pixel data the GPU can access.
+	// Load a .bmp into a surface, move it to a MyGameTexture from there.
+	SDL_asprintf(&bmp_path, "%s%s", SDL_GetBasePath(), p_filename); // allocate a string of the full file path
+
+	surface = IMG_Load(bmp_path);
+	if (!surface) {
+		printf("Couldn't load image: %s\n", SDL_GetError());
+		SDL_Log("Couldn't load image: %s", SDL_GetError());
+		quit_game_with_log_error("data management error.\n", 1);
+	}
+	SDL_free(bmp_path);  // done with this, the file is loaded.
+
+	if (SDL_SetSurfaceColorKey(surface, true,
+			SDL_MapSurfaceRGB(surface, 0xFF, 0xFF, 0xFF)) == false) {
+		printf("Unable to color key! SDL error: %s\n", SDL_GetError());
+		SDL_Log("Unable to color key! SDL error: %s", SDL_GetError());
+		quit_game_with_log_error("data management error.\n", 1);
+	}
+
+	SDL_Texture *tmp_texture = SDL_CreateTextureFromSurface(sdla_get_renderer(),
+			surface);
+	if (tmp_texture == NULL) {
+		printf("Couldn't convert surface to texture : %s\n", SDL_GetError());
+		SDL_Log("Couldn't convert surface to texture : %s", SDL_GetError());
+		quit_game_with_log_error("data management error.\n", 1);
+	}
+
+	mt_add_texture(p_tex_hook_id, tmp_texture, tmp_texture->w, tmp_texture->h);
+
+	SDL_DestroySurface(surface); // done with this, the MyGameTexture has a copy of the pixels now.
+
+	printf("hooking texture %s ... \n", p_tex_hook_id);
+	if (p_hook != NULL) {
+		*p_hook = mt_search_texture(p_tex_hook_id);
+
+		if (*p_hook == NULL) {
+			printf("could not find %s in the tree! exit.\n", p_tex_hook_id);
+			quit_game_with_log_error("data management error.\n", 1);
+		}
+		printf("adress hook[%s] : [%p]\n", p_tex_hook_id, *p_hook);
+	}
+
+	return TRUE;
+}
+
 static int mt_in_load_texture(char *p_filename, MyGameTexture_t **p_hook)
 {
     SDL_Surface *surface = NULL;
@@ -57,14 +111,15 @@ static int mt_in_load_texture(char *p_filename, MyGameTexture_t **p_hook)
     SDL_Texture *tmp_texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (tmp_texture == NULL)
     {
-        printf("Couldn't convert surface to texture : %s\n", SDL_GetError());
+    	SDL_DestroySurface(surface);
+    	printf("Couldn't convert surface to texture : %s\n", SDL_GetError());
         SDL_Log("Couldn't convert surface to texture : %s", SDL_GetError());
         quit_game_with_log_error("data management error.\n", 1);
     }
 
     mt_add_texture(p_filename, tmp_texture, tmp_texture->w, tmp_texture->h);
 
-    /* SDL_DestroySurface(surface); */ /* done with this, the MyGameTexture_t has a copy of the pixels now. */
+    SDL_DestroySurface(surface);  /* done with this, the MyGameTexture_t has a copy of the pixels now. */
 
     printf("hooking texture for %s ... \n", p_filename);
     if (p_hook != NULL)
@@ -207,7 +262,11 @@ MyGameTexture_t *mt_add_texture(char p_id[], SDL_Texture *p_tex, int p_width, in
         return ret;
     }
 
-    return root_textures = mt_in_add_texture(root_textures, p_id, p_tex, p_width, p_height);
+    root_textures = mt_in_add_texture(root_textures, p_id, p_tex, p_width, p_height);
+
+    ret = mt_search_texture(p_id);
+
+    return ret;
 }
 
 MyGameTexture_t *mt_search_texture(char p_id[])
@@ -217,5 +276,9 @@ MyGameTexture_t *mt_search_texture(char p_id[])
 
 void mt_destroy_texture_tree()
 {
+	printf("mt_destroy_texture_tree() called.\n");
+	printf("destroying whole texture tree :\n");
     mt_in_tree_textures_destroy(root_textures);
+    root_textures=NULL;
+    printf("mt_destroy_texture_tree() done.\n");
 }

@@ -264,10 +264,10 @@ static void read_highscore() {
 			}
 
 			if (no == 0) {
-				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN);
+				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN-1);
 				printf("hof_data[%d]->score : %s\n", i, hof_data[i]->score);
 			} else if (no == 1) {
-				strncpy(hof_data[i]->name, token, MAX_NAME_LEN);
+				strncpy(hof_data[i]->name, token, MAX_NAME_LEN-1);
 				printf("hof_data[%d]->name : %s\n", i, hof_data[i]->name);
 			}
 			printf("added[%d] : [%s]\n", no, token);

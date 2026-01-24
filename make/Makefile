@@ -19,7 +19,9 @@ LFLAGS := -lSDL3 -lSDL3_image -lm
 
 ifeq ($(MODE), DEBUG)
 	CFLAGS += -g -pg -DDEBUG
+	CFLAGS += -fsanitize=address
 	LFLAGS += -g -pg
+	LFLAGS += -fsanitize=address -static-libasan
 else ifeq ($(MODE), OPTIMIZE2)
 	CFLAGS += -O2
 	LFLAGS += -O2

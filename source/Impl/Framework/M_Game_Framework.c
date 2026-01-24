@@ -14,6 +14,7 @@
 #include "S_Quit.h"
 #include "S_SDL3_Rendering.h"
 #include "S_Shape_Manager.h"
+#include "S_Texture_Manager.h"
 
 unsigned short mg_exit_flag;
 unsigned short mg_flag_fps;
@@ -27,70 +28,16 @@ static int mg_boot(void);
 static int mg_init(void);
 /* add all MyGameTextures to a tree of MyGameTextures */
 static int mg_load_textures(void);
-static int mg_load_texture(char *p_filename, char *p_tex_hook_id,
-		MyGameTexture_t **p_hook);
+/*static int mg_load_texture(char *p_filename, char *p_tex_hook_id,
+		MyGameTexture_t **p_hook);*/
 
 static void mg_quit(void);
-
-static int mg_load_texture(char *p_filename, char *p_tex_hook_id,
-		MyGameTexture_t **p_hook) {
-	SDL_Surface *surface = NULL;
-	char *bmp_path = NULL;
-
-	/* Textures are pixel data that we upload to the video hardware for fast drawing. Lots of 2D
-	 engines refer to these as "sprites." We'll do a static MyGameTexture (upload once, draw many
-	 times) with data from a bitmap file. */
-
-	/* SDL_Surface is pixel data the CPU can access. SDL_Texture is pixel data the GPU can access.
-	 Load a .bmp into a surface, move it to a MyGameTexture from there. */
-	SDL_asprintf(&bmp_path, "%s%s", SDL_GetBasePath(), p_filename); /* allocate a string of the full file path */
-
-	surface = IMG_Load(bmp_path);
-	if (!surface) {
-		printf("Couldn't load image: %s\n", SDL_GetError());
-		SDL_Log("Couldn't load image: %s", SDL_GetError());
-		quit_game_with_log_error("data management error.\n", 1);
-	}
-	SDL_free(bmp_path); /* done with this, the file is loaded. */
-
-	if (SDL_SetSurfaceColorKey(surface, true,
-			SDL_MapSurfaceRGB(surface, 0xFF, 0xFF, 0xFF)) == false) {
-		printf("Unable to color key! SDL error: %s\n", SDL_GetError());
-		SDL_Log("Unable to color key! SDL error: %s", SDL_GetError());
-		quit_game_with_log_error("data management error.\n", 1);
-	}
-
-	SDL_Texture *tmp_texture = SDL_CreateTextureFromSurface(sdla_get_renderer(),
-			surface);
-	if (tmp_texture == NULL) {
-		printf("Couldn't convert surface to texture : %s\n", SDL_GetError());
-		SDL_Log("Couldn't convert surface to texture : %s", SDL_GetError());
-		quit_game_with_log_error("data management error.\n", 1);
-	}
-
-	mt_add_texture(p_tex_hook_id, tmp_texture, tmp_texture->w, tmp_texture->h);
-
-	/* SDL_DestroySurface(surface); *//* done with this, the MyGameTexture has a copy of the pixels now. */
-
-	printf("hooking texture %s ... \n", p_tex_hook_id);
-	if (p_hook != NULL) {
-		*p_hook = mt_search_texture(p_tex_hook_id);
-
-		if (*p_hook == NULL) {
-			printf("could not find %s in the tree! exit.\n", p_tex_hook_id);
-			quit_game_with_log_error("data management error.\n", 1);
-		}
-		printf("adress hook[%s] : [%p]\n", p_tex_hook_id, *p_hook);
-	}
-
-	return TRUE;
-}
 
 /* Load the MyGameTextures for the core game. */
 static int mg_load_textures() {
 	/* FONTS : */
 
-	mg_load_texture(FILE_FONT_DATA_01, HOOK_FONT_DATA_01, NULL);
+	mt_load_texture_with_id(FILE_FONT_DATA_01, HOOK_FONT_DATA_01, NULL);
 
 	if (mt_search_texture(HOOK_FONT_DATA_01) == NULL) {
 		printf("could not load fonts!\n");
@@ -99,9 +46,9 @@ static int mg_load_textures() {
 
 	/* MAIN MENU : */
 
-	mg_load_texture(FILE_MMENU_SCREEN_MASK_OFF, HOOK_MMENU_SCREEN_MASK_OFF,
+	mt_load_texture_with_id(FILE_MMENU_SCREEN_MASK_OFF, HOOK_MMENU_SCREEN_MASK_OFF,
 	NULL);
-	mg_load_texture(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
+	mt_load_texture_with_id(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
 
 	if ((mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF) == NULL)
 			|| (mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON) == NULL)) {
@@ -111,7 +58,7 @@ static int mg_load_textures() {
 
 	/* HALL OF FAME : */
 
-	mg_load_texture(FILE_HOF_SCREEN_MASK, HOOK_HOF_SCREEN_MASK, NULL);
+	mt_load_texture_with_id(FILE_HOF_SCREEN_MASK, HOOK_HOF_SCREEN_MASK, NULL);
 
 	if (mt_search_texture(HOOK_HOF_SCREEN_MASK) == NULL) {
 		printf("could not load textures for hall of fame!\n");
@@ -120,9 +67,9 @@ static int mg_load_textures() {
 
 	/* INGAME : */
 
-	mg_load_texture(FILE_INGAME_SCREEN_MASK, HOOK_INGAME_SCREEN_MASK, NULL);
-	mg_load_texture(FILE_CELL_BLOCK_MASK, HOOK_CELL_BLOCK_MASK, NULL);
-	mg_load_texture(FILE_CELL_FREE_MASK, HOOK_CELL_FREE_MASK, NULL);
+	mt_load_texture_with_id(FILE_INGAME_SCREEN_MASK, HOOK_INGAME_SCREEN_MASK, NULL);
+	mt_load_texture_with_id(FILE_CELL_BLOCK_MASK, HOOK_CELL_BLOCK_MASK, NULL);
+	mt_load_texture_with_id(FILE_CELL_FREE_MASK, HOOK_CELL_FREE_MASK, NULL);
 
 	if ((mt_search_texture(HOOK_INGAME_SCREEN_MASK) == NULL)
 			|| (mt_search_texture(HOOK_CELL_BLOCK_MASK) == NULL)
@@ -133,7 +80,7 @@ static int mg_load_textures() {
 
 	/* ALPHA INGAME */
 
-	mg_load_texture(FILE_CELL_BLOCK_MASK_ALPHA, HOOK_CELL_BLOCK_MASK_ALPHA,
+	mt_load_texture_with_id(FILE_CELL_BLOCK_MASK_ALPHA, HOOK_CELL_BLOCK_MASK_ALPHA,
 			NULL);
 
 	return TRUE;
@@ -227,7 +174,3 @@ static int mg_init() {
 static void mg_quit() {
 	prepare_quit_game();
 }
-
-/*Uint64 mg_get_freq() {
- return mg_freq;
- }*/

@@ -169,4 +169,5 @@ ShapeNode_t *search_shape(char *p_id)
 void destroy_shape_tree()
 {
     tree_shapes_destroy(root_shapes);
+    root_shapes=NULL;
 }
