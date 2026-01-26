@@ -19,4 +19,4 @@ echo "CHANGE:"
 echo "FROM COLOR : 0x${fromcolbyte1}, 0x${fromcolbyte2}, 0x${fromcolbyte3}"
 echo "TO COLOR : 0x${tocolbyte1}, 0x${tocolbyte2}, 0x${tocolbyte3}"
 
-find $1 -name "$2" -print0 | xargs -0 -I {} convert "{}" -fuzz 30% -fill "rgb(0x${tocolbyte1}, 0x${tocolbyte2},0x${tocolbyte3})" -opaque "rgb(0x${fromcolbyte1}, 0x${fromcolbyte2},0x${fromcolbyte3})" "{}"
+find $1 -name "$2" -print0 | xargs -t -0 -I {} convert "{}" -fuzz 30% -fill "rgb(0x${tocolbyte1}, 0x${tocolbyte2},0x${tocolbyte3})" -opaque "rgb(0x${fromcolbyte1}, 0x${fromcolbyte2},0x${fromcolbyte3})" "{}"

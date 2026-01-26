@@ -8,10 +8,6 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
-echo "CHANGE: $3"
-echo "FOLDER: $1"
-echo "PATTERN: $2"
-
-find $1 -name "$2" -print0 | xargs -0 -I {} convert "{}" -resize $3 "{}"
+find $1 -name "$2" -print0 | xargs -t -0 -I {} convert "{}" -resize "$3" "{}"
 
 

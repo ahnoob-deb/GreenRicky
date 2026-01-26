@@ -392,6 +392,8 @@ static void hof_core_render() {
 	unsigned int hof_color = 6;
 	unsigned int hof_cscore_color = 2;
 
+	sdla_printf_tex2(290, 60, 3, "HIGHSCORES");
+
 	while ((i < MAX_TOPS) && (hof_data[i] != NULL)) {
 		if ((i == hof_change_index) && hof_edit) {
 			if (strlen(hof_data[i]->score) > 0) {

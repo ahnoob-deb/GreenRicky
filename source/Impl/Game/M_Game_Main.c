@@ -7,6 +7,7 @@
 
 #include <time.h>
 #include "D_Common.h"
+#include "D_fonts.h"
 #include "S_Game_Objects.h"
 #include "S_Quit.h"
 #include "S_SDL3_Rendering.h"
@@ -852,6 +853,9 @@ static void cg_render_next_piece() {
 
 	size_t index = 0;
 
+	sdla_printf_tex2(87, 140, 3, "NEXT");
+	sdla_printf_tex2(67, 140+YSPACEING, 3, "PIECE");
+
 	for (index = 0; index < PIECE_WIDTH * PIECE_HEIGHT; index++) {
 
 		drawx = index % PIECE_WIDTH - sh->min_x;
@@ -868,6 +872,9 @@ static void cg_render_next_piece() {
 
 /* simply renders the current statistics to screen. */
 static void cg_render_stats() {
+
+	sdla_printf_tex2(570, 230, 3, "STATISTICS");
+
 	/* rows */
 	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5, "Rows destroyed : %d", cg_stats.rows_destroyed);
 	/* rows */
@@ -885,6 +892,9 @@ static void cg_core_render() {
 
 	/* render the ingame background image */
 	sdla_render_texture(mt_search_texture(HOOK_INGAME_SCREEN_MASK), 0.0f, 0.0f);
+
+	sdla_printf_tex2(361, 40, 3, "GREEN");
+	sdla_printf_tex2(341, 40+YSPACEING, 3, "RICKY");
 
 	/* then, add the map ... */
 	cg_map_render(&cg_map_data);

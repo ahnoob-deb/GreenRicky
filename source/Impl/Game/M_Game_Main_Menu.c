@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "D_Common.h"
+#include "D_fonts.h"
 #include "S_SDL3_Rendering.h"
 
 static int mm_game_state;
@@ -121,30 +122,34 @@ static void mm_render() {
 	/* render the ingame background image */
 	sdla_render_texture(mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF), 0.0f, 0.0f);
 
+	int startx=320;
+	int starty=182;
+
+	sdla_printf_tex2(290, 35, 3, "GREEN");
+	sdla_printf_tex2(330, 35+YSPACEING, 3, "RICKY");
+
+	sdla_printf_tex2(startx, starty, 2, "NEW GAME");
+	sdla_printf_tex2(startx, starty+2*YSPACEING, 2, "OPTIONS");
+	sdla_printf_tex2(startx-25, starty+4*YSPACEING, 2, "HALL OF FAME");
+	sdla_printf_tex2(startx+20, starty+6*YSPACEING, 2, "EXIT");
+
+
 	/* render, which option is chosen. */
 	switch (mm_menu_option) {
 	case MM_OPT_NEW_GAME:
-		sdla_render_rect_from_tex(mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON),
-				304.0f, 182.0f, 304.0f + 165.0f, 182.0f + 40.0f, 304.0f, 182.0f,
-				304.0f + 165.0f, 182.0f + 40.0f);
+		sdla_printf_tex2(startx, starty, 3, "NEW GAME");
 		break;
 
 	case MM_OPT_OPTIONS:
-		sdla_render_rect_from_tex(mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON),
-				304.0f, 248.0f, 304.0f + 127.0f, 248.0f + 51.0f, 304.0f, 248.0f,
-				304.0f + 127.0f, 248.0f + 51.0f);
+		sdla_printf_tex2(startx, starty+2*YSPACEING, 3, "OPTIONS");
 		break;
 
 	case MM_OPT_HALL_OF_FAME:
-		sdla_render_rect_from_tex(mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON),
-				304.0f, 320.0f, 304.0f + 186.0f, 320.0f + 43.0f, 304.0f, 320.0f,
-				304.0f + 186.0f, 320.0f + 43.0f);
+		sdla_printf_tex2(startx-25, starty+4*YSPACEING, 3, "HALL OF FAME");
 		break;
 
 	case MM_OPT_EXIT:
-		sdla_render_rect_from_tex(mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON),
-				304.0f, 391.0f, 304.0f + 71.0f, 391.0f + 43.0f, 304.0f, 391.0f,
-				304.0f + 71.0f, 391.0f + 43.0f);
+		sdla_printf_tex2(startx+20, starty+6*YSPACEING, 3, "EXIT");
 		break;
 
 	default:
