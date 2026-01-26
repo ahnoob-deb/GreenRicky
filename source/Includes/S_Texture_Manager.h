@@ -5,6 +5,10 @@
 
 #define MAX_ID_LENGTH 255
 
+/* FONT FILES */
+#define LETTERS_ID_FONTS_ID_FORMAT_STR "../data/fonts/leadingedge/letters/font0%d.png"
+#define NUMBER_FONTS_ID_FORMAT_STR "../data/fonts/leadingedge/letters/num0%d.png"
+
 /* MAIN MENU TEXTURE-FILES AND HOOK-IDs */
 #define FILE_MMENU_SCREEN_MASK_OFF "../data/pics/masks/Cetris-mmenu-alpha-OFF-001.png"
 #define HOOK_MMENU_SCREEN_MASK_OFF "HOOK_MM_SCR_MSK_OFF_TEX01"

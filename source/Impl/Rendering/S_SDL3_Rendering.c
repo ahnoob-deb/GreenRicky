@@ -11,7 +11,6 @@
 #include "S_Texture_Manager.h"
 #include "R_Resources.h"
 
-
 static SDL_Renderer *renderer = NULL;
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
@@ -39,7 +38,6 @@ SDL_Window* sdla_get_window() {
 	return window;
 }
 
-
 void sdla_render_rect_from_tex(MyGameTexture_t *p_tex, float p_sx1, float p_sy1,
 		float p_sx2, float p_sy2, float p_dx1, float p_dy1, float p_dx2,
 		float p_dy2) {
@@ -59,40 +57,38 @@ void sdla_render_rect_from_tex(MyGameTexture_t *p_tex, float p_sx1, float p_sy1,
 
 static void init_colors() {
 
-	piece_col[0]=COL_WHITE;
-	piece_col[1]=COL_LIGHTBLUE;
-	piece_col[2]=COL_RED;
-	piece_col[3]=COL_YELLOW;
-	piece_col[4]=COL_PURPLE;
-	piece_col[5]=COL_ORANGE;
-	piece_col[6]=COL_GREEN;
-	piece_col[7]=COL_BLUE;
+	piece_col[0] = COL_WHITE;
+	piece_col[1] = COL_LIGHTBLUE;
+	piece_col[2] = COL_RED;
+	piece_col[3] = COL_YELLOW;
+	piece_col[4] = COL_PURPLE;
+	piece_col[5] = COL_ORANGE;
+	piece_col[6] = COL_GREEN;
+	piece_col[7] = COL_BLUE;
 
-	imp_col[0]=COL_IMP[0];
-	imp_col[1]=COL_IMP[1];
-	imp_col[2]=COL_IMP[2];
+	imp_col[0] = COL_IMP[0];
+	imp_col[1] = COL_IMP[1];
+	imp_col[2] = COL_IMP[2];
 
 }
-
 
 void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
 		MyGameColor_t *col, int p_alpha) {
 
 	if (p_tex != NULL) {
 
-	SDL_FRect dst_rect;
+		SDL_FRect dst_rect;
 
-	dst_rect.x = p_x;
-	dst_rect.y = p_y;
-	dst_rect.w = (float) p_tex->width;
-	dst_rect.h = (float) p_tex->height;
+		dst_rect.x = p_x;
+		dst_rect.y = p_y;
+		dst_rect.w = (float) p_tex->width;
+		dst_rect.h = (float) p_tex->height;
 
-	SDL_SetTextureBlendMode(p_tex->texture, SDL_BLENDMODE_BLEND );
-	SDL_SetTextureAlphaMod(p_tex->texture, p_alpha);
-	SDL_SetTextureColorMod(p_tex->texture, col->R,
-			col->G, col->B);
+		SDL_SetTextureBlendMode(p_tex->texture, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(p_tex->texture, p_alpha);
+		SDL_SetTextureColorMod(p_tex->texture, col->R, col->G, col->B);
 
-	SDL_RenderTexture(renderer, p_tex->texture, NULL, &dst_rect);
+		SDL_RenderTexture(renderer, p_tex->texture, NULL, &dst_rect);
 	} else {
 		printf("WARNING : p_tex is NULL : no Rendering!");
 	}
@@ -100,16 +96,16 @@ void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
 
 void sdla_render_texture(MyGameTexture_t *p_tex, float p_x, float p_y) {
 
-	if (p_tex!=NULL) {
+	if (p_tex != NULL) {
 
-	SDL_FRect dst_rect;
+		SDL_FRect dst_rect;
 
-	dst_rect.x = p_x;
-	dst_rect.y = p_y;
-	dst_rect.w = (float) p_tex->width;
-	dst_rect.h = (float) p_tex->height;
+		dst_rect.x = p_x;
+		dst_rect.y = p_y;
+		dst_rect.w = (float) p_tex->width;
+		dst_rect.h = (float) p_tex->height;
 
-	SDL_RenderTexture(renderer, p_tex->texture, NULL, &dst_rect);
+		SDL_RenderTexture(renderer, p_tex->texture, NULL, &dst_rect);
 	} else {
 		printf("WARNING : p_tex is NULL : no Rendering!");
 	}
@@ -161,7 +157,7 @@ void sdla_draw_block_abs(size_t p_x, size_t p_y, size_t p_pm_x, size_t p_pm_y,
 	float drawy = p_pm_y * block_size;
 
 	sdla_render_texture_mod(gfx_piece_block01, p_x + drawx, p_y + drawy,
-			&piece_col[p_color],ALPHA_SOLID);
+			&piece_col[p_color], ALPHA_SOLID);
 }
 
 void sdla_draw_imp(double p_x, double p_y, int imp_val, unsigned int p_alpha) {
@@ -203,7 +199,7 @@ int sdla_process_events() {
 			return EV_INSTANT_QUIT;
 		} else if (event.type == SDL_EVENT_KEY_DOWN) {
 
-			return(event.key.key);
+			return (event.key.key);
 		}
 	}
 	return EV_NO_EVENT;
@@ -290,3 +286,67 @@ void sdla_printf_tex(const int p_x, const int p_y, unsigned int p_col,
 		}
 	}
 }
+
+void sdla_printf_tex2(const int p_x, const int p_y, unsigned int p_col,
+		const char *p_message, ...) {
+	char buffer_text[SIZE_TXT_BUFFER] = { 0 };
+
+	va_list args;
+	va_start(args, p_message);
+
+	vsprintf(buffer_text, p_message, args);
+
+	va_end(args);
+
+	const char *message = buffer_text;
+
+	unsigned int r = (p_col >> 16) & 0xFF;
+	unsigned int g = (p_col >> 8) & 0xFF;
+	unsigned int b = p_col & 0xFF;
+
+	size_t index = 0;
+	//int x = 0;
+	//int y = 0;
+	int draw_start_x = p_x;
+	//int no = 0;
+	char l_image_id[255];
+	int draw = FALSE;
+
+	for (index = 0; index < strlen(message); index++) {
+		draw = FALSE;
+
+		int ch = message[index];
+		if (isdigit(ch)) {
+			//int no = ch - '0';
+
+			sprintf(l_image_id, "num0%d.png", ch);
+			//printf("tex-id is : %s\n", l_image_id);
+
+			draw = TRUE;
+
+		} else if (isalpha(ch)) {
+			int no = toupper(ch);
+
+     		sprintf(l_image_id, "font0%d.png", no);
+			//printf("tex-id is : %s\n", l_image_id);
+			draw = TRUE;
+
+		} else if (isspace(ch)) {
+			draw_start_x += SPACEING;
+			draw = FALSE;
+		}
+
+		if (draw) {
+
+			MyGameTexture_t *tex = mt_search_texture(l_image_id);
+
+			SDL_SetTextureColorMod(tex->texture, r, g, b);
+
+			sdla_render_texture_mod(tex, draw_start_x, p_y, &piece_col[p_col],
+			ALPHA_SOLID);
+			draw_start_x += tex->texture->w;
+		}
+
+	}
+}
+

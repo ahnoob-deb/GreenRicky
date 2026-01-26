@@ -16,6 +16,8 @@
 #include "S_Shape_Manager.h"
 #include "S_Texture_Manager.h"
 
+#include <libgen.h>
+
 unsigned short mg_exit_flag;
 unsigned short mg_flag_fps;
 int mg_main_game_state;
@@ -82,6 +84,34 @@ static int mg_load_textures() {
 
 	mt_load_texture(FILE_CELL_BLOCK_MASK_ALPHA, HOOK_CELL_BLOCK_MASK_ALPHA,
 			NULL);
+
+	/* FONTS */
+	// LETTERS (font0xx.png)
+	for (int i=65;i<=90;i++) {
+        char letter_image_id[255];
+        char *letter_basename;
+        sprintf(letter_image_id, LETTERS_ID_FONTS_ID_FORMAT_STR, i);
+        letter_basename=basename(letter_image_id);
+        printf("letter_image_id: '%s'\n", letter_image_id);
+        printf("letter_basename: '%s'\n", letter_basename);
+
+    	mt_load_texture(letter_image_id, letter_basename,
+    			NULL);
+	}
+
+	// NUMBERS (num0xx.png)
+
+	for (int i=48;i<=57;i++) {
+        char num_image_id[255];
+        char *num_basename;
+        sprintf(num_image_id, NUMBER_FONTS_ID_FORMAT_STR, i);
+        num_basename=basename(num_image_id);
+        printf("letter_image_id: '%s'\n", num_image_id);
+        printf("letter_basename: '%s'\n", num_basename);
+
+    	mt_load_texture(num_image_id, num_basename,
+    			NULL);
+	}
 
 	return TRUE;
 }

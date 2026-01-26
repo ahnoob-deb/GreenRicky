@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "D_Common.h"
+#include "D_fonts.h"
 #include "S_Quit.h"
 #include "S_SDL3_Rendering.h"
 
@@ -386,24 +387,24 @@ static void hof_core_render() {
 	sdla_render_texture(mt_search_texture(HOOK_HOF_SCREEN_MASK), 0.0f, 0.0f);
 
 	int i = 0;
-	int x = 80;
+	int x = 90;
 	int y = 170;
-	unsigned int hof_color = HOF_COLOR;
-	unsigned int hof_cscore_color = HOF_CSCORE_COLOR;
+	unsigned int hof_color = 6;
+	unsigned int hof_cscore_color = 2;
 
 	while ((i < MAX_TOPS) && (hof_data[i] != NULL)) {
 		if ((i == hof_change_index) && hof_edit) {
 			if (strlen(hof_data[i]->score) > 0) {
-				sdla_printf_tex(x, y, hof_cscore_color, hof_data[i]->score);
-				sdla_printf_tex(x + 5 * 40, y, hof_cscore_color,
+				sdla_printf_tex2(x, y, hof_cscore_color, hof_data[i]->score);
+				sdla_printf_tex2(x + 5 * 40, y, hof_cscore_color,
 						hof_data[i]->name);
 			}
 
 		} else {
-			sdla_printf_tex(x, y, hof_color, hof_data[i]->score);
-			sdla_printf_tex(x + 5 * 40, y, hof_color, hof_data[i]->name);
+			sdla_printf_tex2(x, y, hof_color, hof_data[i]->score);
+			sdla_printf_tex2(x + 5 * 40, y, hof_color, hof_data[i]->name);
 		}
-		y += 30;
+		y += YSPACEING;
 		i++;
 	}
 

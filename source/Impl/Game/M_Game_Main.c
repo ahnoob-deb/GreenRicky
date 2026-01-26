@@ -376,7 +376,7 @@ static unsigned short cg_poi_is_block(int p_index, double p_add_x,
 
 /* the central collision detection. the heart of the tetris game.
  * This function checks for collisions between the Piece_t and the map
- * If a collision is detected, the Piece_t is set to not moveable.
+ * If a collision is detected at all borders, the Piece_t is set to not moveable.
  *
  * This function returns an integer, where several bits are used to
  * mark a collision :
@@ -417,13 +417,10 @@ static int cg_collision_detection(int p_direction, double p_add_y) {
 
 		if (cg_current_piece.sh_data[p_direction]->matrix[index] > FREE) {
 			/* calculate point of interest in the map
-			 which is here the point below.
-			 dont forget : the Piece_t's x and y coordinates are
-			 relative in the maps field. */
+			   dont forget : the Piece_t's x and y coordinates are
+			   relative in the maps field. */
 
-			/* map_poi_y = cur_pce.y + (index / PIECE_WIDTH) + 1; */
-
-			/* check if Piece_t is in another Piece_t in the map */
+			/* check if Piece_t overlaps with another Piece_t in the map */
 			if (cg_poi_is_block(index, 0, 0, p_direction)) {
 				/* set bit for collision below */
 				collision_bits = COLL_ALL;
