@@ -118,11 +118,12 @@ static int mg_load_textures() {
 
 void mg_run() {
 
-	if (mg_boot() == TRUE) {
+	if (mg_boot()) {
 		printf("mg_run() : booting complete...\n");
 
 	} else {
 		printf("ERROR!\n");
+		mg_quit();
 		return;
 	}
 

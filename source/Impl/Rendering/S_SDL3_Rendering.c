@@ -121,16 +121,24 @@ int gfx_init_hooks() {
 
 int sdla_boot_mmAPI_SDL() {
 
-	SDL_SetAppMetadata("Cetris", "0.1.0", "Cetris");
+	SDL_Init(SDL_INIT_VIDEO);
 
-	if (!SDL_Init(SDL_INIT_VIDEO)) {
-		SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+	SDL_WindowFlags flags=0;
+
+	if (FULLSCREEN) flags |= SDL_WINDOW_FULLSCREEN;
+
+	window = SDL_CreateWindow(WORKINGNAME, WINDOW_WIDTH, WINDOW_HEIGHT, flags);
+
+	if (!window) {
+		SDL_Log("Error creating window: %s", SDL_GetError());
 		return FALSE;
 	}
 
-	if (!SDL_CreateWindowAndRenderer("Cetris", WINDOW_WIDTH, WINDOW_HEIGHT, 0,
-			&window, &renderer)) {
-		SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+	//SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d");
+	renderer = SDL_CreateRenderer(window, NULL);
+
+	if (!renderer) {
+		SDL_Log("Error creating renderer: %s", SDL_GetError());
 		return FALSE;
 	}
 
@@ -327,7 +335,7 @@ void sdla_printf_tex2(const int p_x, const int p_y, unsigned int p_col,
 		} else if (isalpha(ch)) {
 			int no = toupper(ch);
 
-     		sprintf(l_image_id, "font0%d.png", no);
+			sprintf(l_image_id, "font0%d.png", no);
 			//printf("tex-id is : %s\n", l_image_id);
 			draw = TRUE;
 

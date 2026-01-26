@@ -31,8 +31,9 @@
 #define DEBUG_LEVEL DEBUG_VERBOSE
 
 /* Dimensions of the Cetris-Window */
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1360
+#define WINDOW_HEIGHT 768
+#define FULLSCREEN TRUE
 #define TARGET_FPS 60
 
 
