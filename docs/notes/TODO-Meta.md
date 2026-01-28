@@ -1,6 +1,8 @@
 TODO for version 0.9 alpha :
 
 * all printf-calls must be replaced by a log-function
+* different patterns in the pieces like in the gameboy-color-version.
+* all stats must be displayed with the new font.
 * change piece-colors to Game Boy Color Tetris-DX-colorscheme +++> DONE
 * calculation of type of next piece must become better (Classic "Randomizer" System (NES) --- see docs/notes/Calculation-of-next-piece.md) +++> DONE
 * pressing enter in core game should drop the piece. +++> DONE

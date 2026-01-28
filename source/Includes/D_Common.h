@@ -33,11 +33,32 @@
 #define DEBUG_LEVEL DEBUG_VERBOSE
 
 /* Dimensions of the Cetris-Window */
+
+/* commmon 16:9 resolutions: 
+ *
+ * My TVs native Resolution : 1360x768
+ * HD Ready (720p): 1280x720 Pixel.
+ * Full HD (1080p): 1920x1080 Pixel.
+ * QHD / WQHD (1440p): 2560x1440 Pixel.
+ * 4K UHD (2160p): 3840x2160 Pixel.
+ * 8K UHD (4320p): 7680x4320 Pixel.
+ * more: 1600x900 (HD+), 5120x2880 (5K)
+ */
+
+/*
 #define RES_WIDTH 1360
 #define RES_HEIGHT 768
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define FULLSCREEN FALSE
+#define TARGET_FPS 60
+*/
+
+#define RES_WIDTH 1360
+#define RES_HEIGHT 768
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+#define FULLSCREEN TRUE
 #define TARGET_FPS 60
 
 
