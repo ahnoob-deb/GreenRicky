@@ -7,11 +7,11 @@ TODO for version 0.9 alpha :
 * add fullscreen-mode +++> DONE
 * keyboard-delay is poor at the moment - make it better and fast! +++> DONE
 * pressing enter in core game should park the piece.
-* switch to fullscreen 800x600
+* switch to fullscreen 800x600 +++> DONE
 
 BUGS :
 
-* If you type "abcdefghijklmnopqrst" in hall of fame, there is a segmention fault at "t", the 20th letter. +++> FIXED
+* BUG #1 : If you type "abcdefghijklmnopqrst" in hall of fame, there is a segmention fault at "t", the 20th letter. +++> FIXED
 
 TODO in new branch after 0.9 alpha :
 
