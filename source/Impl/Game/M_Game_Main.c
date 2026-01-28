@@ -559,20 +559,20 @@ static void cg_implode_full_lines() {
 		count_lines++;
 	}
 
+	int sco = 0;
+
 	/* update the score depending on how many lines where destroyed */
-	int sco = count_lines * SCORE_PER_LINE;
+	if (count_lines < MAX_FULL_LINES) {
+		sco = count_lines * SCORE_PER_LINE;
+	} else if (count_lines == MAX_FULL_LINES) {
 
-	/* if four lines were destroyed at once, the score will be
-	 multiplied by SCORE_FAC_FOUR_LINES, so its rewarding to
-	 destroy four lines at once, even if it is dangerous */
-	if (count_lines == MAX_FULL_LINES)
-		/* update the score statistics */
 		sco += SCORE_FOUR_LINES;
+	}
 
-
+	// update the score statistics
 	cg_stats.score += sco;
 
-	/* clear the array of "full_lines" now */
+	// clear the array of "full_lines" now
 	cg_clear_full_lines();
 }
 
@@ -710,34 +710,34 @@ void cg_calc_fps() {
 
 static void cg_check_level() {
 
-	int reset_speed=FALSE;
+	int reset_speed = FALSE;
 
-	if ((cg_stats.level<=6) && (cg_stats.score > LEVEL6_BORDER)) {
+	if ((cg_stats.level <= 6) && (cg_stats.score >= LEVEL6_BORDER)) {
 		cg_reset_speed = L7_FALL_PER_SECOND;
 		cg_stats.level = 7;
 		printf("level=7\n");
 		reset_speed = TRUE;
-	} else if ((cg_stats.level<=5) && (cg_stats.score > LEVEL5_BORDER)) {
+	} else if ((cg_stats.level <= 5) && (cg_stats.score >= LEVEL5_BORDER)) {
 		cg_reset_speed = L6_FALL_PER_SECOND;
 		cg_stats.level = 6;
 		printf("level=6\n");
 		reset_speed = TRUE;
-	} else if ((cg_stats.level<=4) && (cg_stats.score > LEVEL4_BORDER)) {
+	} else if ((cg_stats.level <= 4) && (cg_stats.score >= LEVEL4_BORDER)) {
 		cg_reset_speed = L5_FALL_PER_SECOND;
 		cg_stats.level = 5;
 		printf("level=5\n");
 		reset_speed = TRUE;
-	} else if ((cg_stats.level<=3) && (cg_stats.score > LEVEL3_BORDER)) {
+	} else if ((cg_stats.level <= 3) && (cg_stats.score >= LEVEL3_BORDER)) {
 		cg_reset_speed = L4_FALL_PER_SECOND;
 		cg_stats.level = 4;
 		printf("level=4\n");
 		reset_speed = TRUE;
-	} else if ((cg_stats.level<=2) && (cg_stats.score > LEVEL2_BORDER)) {
+	} else if ((cg_stats.level <= 2) && (cg_stats.score >= LEVEL2_BORDER)) {
 		cg_reset_speed = L3_FALL_PER_SECOND;
 		cg_stats.level = 3;
 		printf("level=3\n");
 		reset_speed = TRUE;
-	} else if ((cg_stats.level==1) && (cg_stats.score > LEVEL1_BORDER)) {
+	} else if ((cg_stats.level == 1) && (cg_stats.score >= LEVEL1_BORDER)) {
 		cg_reset_speed = L2_FALL_PER_SECOND;
 		cg_stats.level = 2;
 		printf("level=2\n");
@@ -745,8 +745,8 @@ static void cg_check_level() {
 	}
 
 	if (reset_speed) {
-	    printf("reseting speed\n");
-		cg_current_speed=cg_reset_speed;
+		printf("reseting speed\n");
+		cg_current_speed = cg_reset_speed;
 	}
 
 }
@@ -780,7 +780,6 @@ static void cg_main_loop() {
 
 		/* check for game over state */
 		cg_check_game_over();
-		cg_check_level();
 
 		/* if not game over ... */
 		if (!cg_game_over_flag) {
@@ -798,9 +797,12 @@ static void cg_main_loop() {
 				cg_toi = ((SDL_GetPerformanceCounter() - moment_of_interest1)
 						/ cg_freq) * SEC_UNIT;
 				printf("TOW : %d\n", cg_toi);
-				if (cg_toi >= IMPLODING_TIME)
+				if (cg_toi >= IMPLODING_TIME) {
 					/* ... let them implode. */
 					cg_implode_full_lines();
+
+				    cg_check_level();
+				}
 			}
 
 			/* calc the collision info */
@@ -836,12 +838,14 @@ static void cg_main_loop() {
 
 						/* ... park the Piece_t in the map - finally ;) */
 						cg_park_piece();
+					    cg_check_level();
 
 						/* check if there are full lines */
 						cg_check_full_lines();
 
 						/* then, switch to the next Piece_t. */
 						cg_switch_next_piece();
+
 					}
 				}
 				/* if the Piece_t is not yet marked for landing but collides... */
