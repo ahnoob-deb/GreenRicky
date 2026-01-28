@@ -37,8 +37,8 @@
 #define RES_HEIGHT 768
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#define FULLSCREEN TRUE
-#define TARGET_FPS 6000
+#define FULLSCREEN FALSE
+#define TARGET_FPS 60
 
 
 #define FILE_HOF "../data/hof/hof.txt"

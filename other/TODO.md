@@ -9,6 +9,10 @@ TODO for version 0.9 alpha :
 * pressing enter in core game should park the piece.
 * switch to fullscreen 800x600
 
+BUGS :
+
+* If you type "abcdefghijklmnopqrst" in hall of fame, there is a segmention fault at "t", the 20th letter. +++> FIXED
+
 TODO in new branch after 0.9 alpha :
 
 * make it portable

@@ -269,10 +269,10 @@ static void read_highscore() {
 			}
 
 			if (no == 0) {
-				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN - 1);
+				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN-1);
 				printf("hof_data[%d]->score : %s\n", i, hof_data[i]->score);
 			} else if (no == 1) {
-				strncpy(hof_data[i]->name, token, MAX_NAME_LEN - 1);
+				strncpy(hof_data[i]->name, token, MAX_NAME_LEN-1);
 				printf("hof_data[%d]->name : %s\n", i, hof_data[i]->name);
 			}
 			printf("added[%d] : [%s]\n", no, token);
@@ -373,7 +373,7 @@ static void hof_dispatch_keyboard_events() {
 				if (((event.key.key >= (int) SDLK_0) && (event.key.key <= (int) SDLK_9))
 						|| ((event.key.key >= (int) SDLK_A) && (event.key.key <= (int) SDLK_Z))) {
 					printf("adding printable char at %d\n", hof_letter_index);
-					if (hof_letter_index < MAX_NAME_LEN) {
+					if (hof_letter_index < MAX_NAME_LEN-1) {
 						hof_data[hof_change_index]->name[hof_letter_index++] =
 								event.key.key;
 						hof_first_letter_set = TRUE;
