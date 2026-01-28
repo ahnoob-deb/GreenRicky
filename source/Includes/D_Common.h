@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* Project name and version information */
-#define WORKINGNAME "Green Ricky"
+#define WORKINGNAME "GREEN TEA"
 #define VERSION "0.8.0"
 
 /* Main programmers name and gitHub information */
@@ -102,8 +102,9 @@
 /* The number of different shapes of the Pieces */
 #define COUNT_SHAPES 7
 
-/* 5 MyGameColors are defined for the Pieces (for now). */
-#define COUNT_PIECE_COLORS 8
+/* 7 MyGameColors are defined for the Pieces (for now). */
+#define COUNT_PIECE_COLORS COUNT_SHAPES+1
+#define COUNT_TEXT_COLORS 8
 
 /* 5 MyGameColors are defined for the map (for now). */
 #define COUNT_MAP_COLORS 6

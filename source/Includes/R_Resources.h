@@ -13,6 +13,12 @@ extern MyGameColor_t COL_ORANGE;
 extern MyGameColor_t COL_GREEN;
 extern MyGameColor_t COL_BLUE;
 
+extern MyGameColor_t COL_SEAGREEN;
+extern MyGameColor_t COL_CYANBLUE;
+extern MyGameColor_t COL_DARKORANGE;
+extern MyGameColor_t COL_LIGHTORANGE;
+
+
 extern MyGameColor_t COL_IMP[];
 
 

@@ -15,6 +15,7 @@ static SDL_Renderer *renderer = NULL;
 /* We will use this renderer to draw into this window every frame. */
 static SDL_Window *window = NULL;
 static MyGameColor_t piece_col[COUNT_PIECE_COLORS];
+static MyGameColor_t text_col[COUNT_TEXT_COLORS];
 static MyGameColor_t imp_col[COUNT_IMP_COLORS];
 static void init_colors(void);
 
@@ -57,14 +58,24 @@ void sdla_render_rect_from_tex(MyGameTexture_t *p_tex, float p_sx1, float p_sy1,
 
 static void init_colors() {
 
-	piece_col[0] = COL_WHITE;
-	piece_col[1] = COL_LIGHTBLUE;
-	piece_col[2] = COL_RED;
-	piece_col[3] = COL_YELLOW;
-	piece_col[4] = COL_PURPLE;
-	piece_col[5] = COL_ORANGE;
-	piece_col[6] = COL_GREEN;
-	piece_col[7] = COL_BLUE;
+	text_col[0] = COL_WHITE;          // RESERVED
+	text_col[1] = COL_LIGHTBLUE;
+	text_col[2] = COL_RED;
+	text_col[3] = COL_YELLOW;
+	text_col[4] = COL_PURPLE;
+	text_col[5] = COL_ORANGE;
+	text_col[6] = COL_GREEN;
+	text_col[7] = COL_BLUE;
+
+	piece_col[0] = COL_WHITE;         // RESERVED
+	piece_col[1] = COL_SEAGREEN;      // T
+	piece_col[2] = COL_RED;           // L
+	piece_col[3] = COL_CYANBLUE;      // J
+	piece_col[4] = COL_LIGHTORANGE;   // Z
+    piece_col[5] = COL_PURPLE;        // S
+	piece_col[6] = COL_YELLOW;        // O
+	piece_col[7] = COL_DARKORANGE;    // I
+
 
 	imp_col[0] = COL_IMP[0];
 	imp_col[1] = COL_IMP[1];
@@ -357,7 +368,7 @@ void sdla_printf_tex2(const int p_x, const int p_y, unsigned int p_col,
 
 			SDL_SetTextureColorMod(tex->texture, r, g, b);
 
-			sdla_render_texture_mod(tex, draw_start_x, p_y, &piece_col[p_col],
+			sdla_render_texture_mod(tex, draw_start_x, p_y, &text_col[p_col],
 			ALPHA_SOLID);
 			draw_start_x += tex->texture->w;
 		}

@@ -21,3 +21,22 @@ The Tetris The Grand Master (TGM) series uses a "Memory 4" system.
     Method: The game keeps a history of the last four pieces.
     Selection: It attempts to pick a new piece, but if it is present in the history, it "re-rolls" up to 6 times to try to find a piece not in the history.
     Result: This significantly reduces the likelihood of seeing the same piece consecutively. 
+    
+ Technical Color Assignment
+In development, each piece shape (matrix) is usually mapped to a specific color identifier: 
+
+    A random index is chosen (0-6) based on the bag system.
+    The corresponding piece shape is fetched from a library.
+    The color is assigned based on the typeId. 
+
+Tetris Guideline Colors: 
+( according to Game Boy Color Longplay Tetris-DX )
+( see : https://www.youtube.com/watch?v=DwZBJhbiz78 )
+
+    I: Orange (light)
+    O: Yellow
+    T: Green (seagreen)
+    S: Purple
+    Z: Orange (dark)
+    J: Cyanblue
+    L: Red

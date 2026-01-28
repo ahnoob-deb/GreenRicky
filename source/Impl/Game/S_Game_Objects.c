@@ -11,13 +11,13 @@
 
 
 char *gal_shape_ids[COUNT_SHAPES] = {
-    "SHAPE_T",
-    "SHAPE_L_LEFT",
-    "SHAPE_L_RIGHT",
-    "SHAPE_Z_LEFT",
-    "SHAPE_Z_RIGHT",
-    "SHAPE_BLOCK",
-    "SHAPE_STICK"};
+    "SHAPE_T",       // T
+    "SHAPE_L_LEFT",  // L
+    "SHAPE_L_RIGHT", // J
+    "SHAPE_Z_LEFT",  // Z
+    "SHAPE_Z_RIGHT", // S
+    "SHAPE_BLOCK",   // O
+    "SHAPE_STICK"};  // I
 
 
 /* load a shape into the shape-tree */
@@ -162,9 +162,10 @@ Piece_t *gal_piece_new(const unsigned int p_x, const unsigned int p_y,
         quit_game_with_log_error("data management error.", 1);
     }
 
+
+    pce->id_no=p_color;
     pce->x = p_x;
     pce->y = p_y;
-    pce->color = p_color;
     pce->direction = p_dir;
     pce->sh_data = sn->data;
 
@@ -189,7 +190,7 @@ void gal_piece_init(Piece_t *pce, const unsigned int p_x, const unsigned int p_y
 
     pce->x = p_x;
     pce->y = p_y;
-    pce->color = p_color;
+    pce->id_no = p_color;
     pce->direction = p_dir;
     pce->sh_data = sn->data;
 

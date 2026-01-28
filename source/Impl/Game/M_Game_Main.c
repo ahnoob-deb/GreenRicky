@@ -215,7 +215,7 @@ static int cg_init() {
 
 /* render a Piece_t to screen. */
 static void cg_piece_render(Piece_t *p_pce) {
-	int color = p_pce->color;
+	int color = p_pce->id_no+1;
 	int value_of_shape = 0;
 
 	int drawx = 0;
@@ -568,7 +568,7 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 
 	/* random color
 	 COLOR[0] is reserved for collapsing lines (for now) !!! */
-	int rand_color = rand() % (COUNT_PIECE_COLORS - 1) + 1;
+	//int rand_color = rand() % (COUNT_PIECE_COLORS - 1) + 1;
 
 	/* random direction of the shape */
 	int rand_direction = rand() % COUNT_DIRECTIONS;
@@ -577,7 +577,7 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 	pce->id_no = rand_shape_no;
 	pce->x = SPAWN_X;
 	pce->y = SPAWN_Y;
-	pce->color = rand_color;
+	//pce->color = rand_shape_no;
 	pce->direction = rand_direction;
 	pce->sh_data = sn->data;
 	pce->ready_for_landing = 0;
@@ -587,9 +587,10 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 
 static void cg_switch_next_piece() {
 	/* change the values of the Piece */
+	cg_current_piece.id_no=cg_next_piece.id_no;
 	cg_current_piece.x = SPAWN_X;
 	cg_current_piece.y = SPAWN_Y;
-	cg_current_piece.color = cg_next_piece.color;
+	//cg_current_piece.color = cg_next_piece.color;
 	cg_current_piece.direction = cg_next_piece.direction;
 	cg_current_piece.sh_data = cg_next_piece.sh_data;
 	cg_current_piece.ready_for_landing = 0;
@@ -638,7 +639,7 @@ static void cg_park_piece() {
 
 			/* write the color value into the map */
 			cg_map_data.matrix[park_y * MAP_WIDTH + park_x] =
-					cg_current_piece.color;
+					cg_current_piece.id_no+1;
 		}
 	}
 	/* update game stats. */
@@ -834,7 +835,7 @@ static void cg_main_loop() {
 
 static void cg_render_next_piece() {
 
-	int color = cg_next_piece.color;
+	int color = cg_next_piece.id_no+1;
 	int value_of_shape = 0;
 
 	unsigned int drawx = 0;
@@ -868,19 +869,19 @@ static void cg_render_stats() {
 
 	/* rows */
 	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5,
-			"Rows destroyed : %d", cg_stats.rows_destroyed);
+			"LINES  : %d", cg_stats.rows_destroyed);
 	/* rows */
 	sdla_printf(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING, 5, "Pieces landed  : %d",
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING, 5, "PIECES : %d",
 			cg_stats.count_pieces_landed);
 	/* score */
 	sdla_printf(DRAW_STATISTICS_START_X,
 	DRAW_STATISTICS_START_Y + 2 * STATISTICS_LINE_SPACING, 5,
-			"Total Score    : %d", cg_stats.score);
+			"SCORE  : %d", cg_stats.score);
 	/* level */
 	sdla_printf(DRAW_STATISTICS_START_X,
 	DRAW_STATISTICS_START_Y + 3 * STATISTICS_LINE_SPACING, 5,
-			"Level          : %d", cg_stats.level);
+			"LEVEL  : %d", cg_stats.level);
 }
 
 /* Here, the state of the core game will be drawn to screen */
@@ -891,7 +892,7 @@ static void cg_core_render() {
 	sdla_render_texture(mt_search_texture(HOOK_INGAME_SCREEN_MASK), 0.0f, 0.0f);
 
 	sdla_printf_tex2(361, 40, 3, "GREEN");
-	sdla_printf_tex2(341, 40 + YSPACEING, 3, "RICKY");
+	sdla_printf_tex2(341, 40 + YSPACEING, 3, "TEA");
 
 	/* then, add the map ... */
 	cg_map_render(&cg_map_data);

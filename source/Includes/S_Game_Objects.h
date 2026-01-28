@@ -52,7 +52,6 @@ typedef struct
     unsigned short display;
     unsigned short moveable;
     unsigned short ready_for_landing;
-    unsigned int color;
 
 } Piece_t;
 
