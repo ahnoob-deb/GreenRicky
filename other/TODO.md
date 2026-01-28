@@ -7,6 +7,7 @@ TODO for version 0.9 alpha :
 * add fullscreen-mode +++> DONE
 * keyboard-delay is poor at the moment - make it better and fast! +++> DONE
 * pressing enter in core game should park the piece.
+* switch to fullscreen 800x600
 
 TODO in new branch after 0.9 alpha :
 

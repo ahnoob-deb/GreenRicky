@@ -33,10 +33,12 @@
 #define DEBUG_LEVEL DEBUG_VERBOSE
 
 /* Dimensions of the Cetris-Window */
+#define RES_WIDTH 1360
+#define RES_HEIGHT 768
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#define FULLSCREEN FALSE
-#define TARGET_FPS 60
+#define FULLSCREEN TRUE
+#define TARGET_FPS 6000
 
 
 #define FILE_HOF "../data/hof/hof.txt"

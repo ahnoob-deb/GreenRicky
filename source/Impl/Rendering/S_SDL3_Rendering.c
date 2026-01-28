@@ -142,6 +142,28 @@ int sdla_boot_mmAPI_SDL() {
 		return FALSE;
 	}
 
+	if (FULLSCREEN) {
+
+		SDL_DisplayMode mode;
+		mode.w = RES_WIDTH;
+		mode.h = RES_HEIGHT;
+		mode.refresh_rate = 0; // Use default
+		mode.pixel_density = 1.0f;
+		mode.format = SDL_PIXELFORMAT_UNKNOWN;
+
+		// Set the desired mode
+		//SDL_SetWindowFullscreenMode(window, &mode);
+
+		// Switch to fullscreen
+		//SDL_SetWindowFullscreen(window, true);
+
+		SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+		SDL_SetWindowFullscreenMode(window, &mode);
+
+	}
+
 	init_colors();
 
 	return TRUE;
