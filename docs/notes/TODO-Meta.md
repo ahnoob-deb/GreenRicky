@@ -2,7 +2,7 @@ TODO for version 0.9 alpha :
 
 * all printf-calls must be replaced by a log-function
 * calculation of type of next piece must become better
-* pressing enter in core game should park the piece.
+* pressing enter in core game should drop the piece. +++> DONE
 * remove ALL memory leaks  +++> DONE
 * better selfmade font - letters from leadingedge?! +++> DONE
 * add fullscreen-mode +++> DONE

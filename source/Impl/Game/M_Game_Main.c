@@ -88,6 +88,8 @@ static double cg_reset_speed;
 
 static void cg_switch_next_piece();
 
+static void cg_drop_piece();
+
 /***************************************************/
 /* This is for checking full lines and let them implode. */
 /***************************************************/
@@ -586,6 +588,23 @@ static void cg_switch_next_piece() {
 	cg_spawn_new_piece(&cg_next_piece);
 }
 
+static void cg_drop_piece() {
+
+	double i=1.0;
+
+	for (i=1.0;i<MAP_HEIGHT;i+=1.0) {
+	  int col = cg_collision_detection(
+			cg_current_piece.direction, i);
+
+	  if ((col & COLL_BELOW) == COLL_BELOW)
+		  break;
+	}
+
+	cg_current_piece.y += i-1.0;
+	cg_park_piece();
+}
+
+
 /* land the Piece_t when it collides.
  Piece_t will vanish and become part of the map. */
 static void cg_park_piece() {
@@ -914,7 +933,7 @@ static void cg_dispatch_keyboard_events() {
 				return;
 			}
 			if (event.key.key == SDLK_RETURN) {
-				printf("RETURN BEHAVIOR UNDEFINED FOR NOW!\n");
+				cg_drop_piece();
 				return;
 			}
 			if (event.key.key == SDLK_LEFT) {
