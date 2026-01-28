@@ -132,14 +132,12 @@ static void cg_render_next_piece(void);
 
 /***************************************************/
 
-
 /***************************************************/
 /* VARIABLES USED FOR TIME MEASUREMENT             */
 /***************************************************/
 
 /* old time of measure of the fall of the Piece_t */
 static double cg_fall_mea_old_time;
-
 
 /***************************************************/
 
@@ -414,7 +412,6 @@ static void cg_cur_piece_rotate() {
 	gal_piece_rotate(&cg_current_piece);
 }
 
-
 /* calc the Piece_ts current fall */
 static double cg_calc_fall() {
 	/* measure of current time since programs start */
@@ -540,18 +537,32 @@ static void cg_implode_full_lines() {
 
 /* Spawn a new Piece_t by changing its values, not creating a new Piece_t (!!!).
  * This is possible, because a landed Piece_ts becomes part of the map.
- */
+ * (Classic "Randomizer" System (NES) --- for details see :
+ *  docs/notes/Calculation-of-next-piece.md) */
 static void cg_spawn_new_piece(Piece_t *pce) {
 
-	/* random shape */
-	int rand_shape = rand() % COUNT_SHAPES;
+	int rand_shape_no = 0;
 
-	char *shape_id = gal_shape_ids[rand_shape];
+	char *new_shape_id = NULL;
 
-	ShapeNode_t *sn = search_shape(shape_id);
+	// roll a new shape-nr max twice...
+	for (int i = 0; i < 2; i++) {
+		/* random shape */
+		rand_shape_no = rand() % COUNT_SHAPES;
+		new_shape_id = gal_shape_ids[rand_shape_no];
+
+		// if new piece is different to last...
+		if (rand_shape_no!=cg_current_piece.id_no)
+			// ... its our new piece...
+			break;
+		printf("rolled for new piece twice...");
+	}
+
+	ShapeNode_t *sn = search_shape(new_shape_id);
+
 
 	if (sn == NULL) {
-		printf("could not find shape with id %s for Piece_t.", shape_id);
+		printf("could not find shape with id %s for Piece_t.", new_shape_id);
 		quit_game_with_log_error("data management error.", 1);
 	}
 
@@ -563,6 +574,7 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 	int rand_direction = rand() % COUNT_DIRECTIONS;
 
 	/* change the values of the Piece_t */
+	pce->id_no = rand_shape_no;
 	pce->x = SPAWN_X;
 	pce->y = SPAWN_Y;
 	pce->color = rand_color;
@@ -571,11 +583,10 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 	pce->ready_for_landing = 0;
 	pce->moveable = 1;
 	pce->display = 1;
-
 }
 
 static void cg_switch_next_piece() {
-	/* change the values of the Piece_t */
+	/* change the values of the Piece */
 	cg_current_piece.x = SPAWN_X;
 	cg_current_piece.y = SPAWN_Y;
 	cg_current_piece.color = cg_next_piece.color;
@@ -590,20 +601,18 @@ static void cg_switch_next_piece() {
 
 static void cg_drop_piece() {
 
-	double i=1.0;
+	double i = 1.0;
 
-	for (i=1.0;i<MAP_HEIGHT;i+=1.0) {
-	  int col = cg_collision_detection(
-			cg_current_piece.direction, i);
+	for (i = 1.0; i < MAP_HEIGHT; i += 1.0) {
+		int col = cg_collision_detection(cg_current_piece.direction, i);
 
-	  if ((col & COLL_BELOW) == COLL_BELOW)
-		  break;
+		if ((col & COLL_BELOW) == COLL_BELOW)
+			break;
 	}
 
-	cg_current_piece.y += i-1.0;
+	cg_current_piece.y += i - 1.0;
 	cg_park_piece();
 }
-
 
 /* land the Piece_t when it collides.
  Piece_t will vanish and become part of the map. */
@@ -754,7 +763,7 @@ static void cg_main_loop() {
 					/* ... let them implode. */
 					cg_implode_full_lines();
 
-				    cg_check_level();
+					cg_check_level();
 				}
 			}
 
@@ -791,12 +800,12 @@ static void cg_main_loop() {
 
 						/* ... park the Piece_t in the map - finally ;) */
 						cg_park_piece();
-					    cg_check_level();
+						cg_check_level();
 
 						/* check if there are full lines */
 						cg_check_full_lines();
 
-						/* then, switch to the next Piece_t. */
+						/* then, switch to the next Piece. */
 						cg_switch_next_piece();
 
 					}

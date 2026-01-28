@@ -427,10 +427,8 @@ static void gal_load_shape(const int *p_shape, char *p_id)
          shape_number < COUNT_DIRECTIONS;
          shape_number++)
     {
-
         for (index = 0; index < size_matrix; index++)
         {
-
             sd[shape_number]->matrix[index] =
                 p_shape[shape_number * size_matrix + index];
         }
@@ -440,7 +438,6 @@ static void gal_load_shape(const int *p_shape, char *p_id)
         printf("min_x:%d, min_y:%d, max_x:%d, max_y:%d\n", sd[shape_number]->min_x,
                   sd[shape_number]->min_y, sd[shape_number]->max_x, sd[shape_number]->max_y);
     }
-
     add_shape(p_id, sd);
 }
 

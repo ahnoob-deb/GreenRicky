@@ -44,7 +44,8 @@ void gal_destroy_shape(ShapeData_t **sd);
 typedef struct
 {
 
-    double x;
+    int id_no;
+	double x;
     double y;
     ShapeData_t **sh_data;
     int direction;
