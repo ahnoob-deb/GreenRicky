@@ -12,6 +12,7 @@
 #include "S_Quit.h"
 #include "S_SDL3_Rendering.h"
 #include "S_Shape_Manager.h"
+#include "S_FPS_Counter.h"
 
 static int cg_game_state;
 static int cg_exit_flag;
@@ -130,42 +131,14 @@ static void cg_render_next_piece(void);
 
 /***************************************************/
 
-/***************************************************/
-/*   TIME MEASUREMENT                              */
-/***************************************************/
-
-static Uint64 cg_freq = 0;
-static Uint64 cg_start = 0;
-//static Uint64 cg_last = 0;
-static Uint64 cg_now = 0;
-static Uint64 cg_frame_now = 0;
-static double cg_delta_time_start = 0.0f;
-static double cg_delta_time_frame = 0.0f;
-static double cg_frametime = 0.0f;
-static int cg_sec = 0;
-static int cg_oldsec = 0;
-static int cg_unit = 1000;
 
 /***************************************************/
 /* VARIABLES USED FOR TIME MEASUREMENT             */
 /***************************************************/
 
-static double cg_elapsed_time();
-
 /* old time of measure of the fall of the Piece_t */
 static double cg_fall_mea_old_time;
 
-/***************************************************/
-/* FPS DATA                                        */
-/***************************************************/
-
-static int cg_fps = 0;
-static double cg_frametime_ms_shown = 0.0f;
-static unsigned int cg_frame = 0;
-static unsigned int cg_target_fps = TARGET_FPS;
-
-void cg_limit_fps(void);
-void cg_calc_fps(void);
 
 /***************************************************/
 
@@ -194,18 +167,13 @@ static int cg_init() {
 		cg_booted = TRUE;
 	}
 
-	cg_freq = SDL_GetPerformanceFrequency();
-
-	/* save the start time of the core game */
-	cg_start = SDL_GetPerformanceCounter();
-
 	cg_exit_flag = FALSE;
 	cg_game_state = ST_CORE_GAME;
 	cg_flag_fps = FALSE;
 
 	/* for now, time measure of peace fall is set to
 	 the core games start time */
-	cg_fall_mea_old_time = cg_start;
+	cg_fall_mea_old_time = cou_get_start_ts();
 
 	/* init timer for imploding full lines and its color */
 	cg_toi = 0;
@@ -247,7 +215,7 @@ static int cg_init() {
 }
 
 static void cg_print_fps() {
-	sdla_printf(580, 430, 3, "FPS            : %d", cg_fps);
+	sdla_printf(580, 430, 3, "FPS            : %d", cou_get_fps());
 }
 
 /* render a Piece_t to screen. */
@@ -449,14 +417,11 @@ static void cg_cur_piece_rotate() {
 	gal_piece_rotate(&cg_current_piece);
 }
 
-static double cg_elapsed_time() {
-	return (double) (SDL_GetPerformanceCounter() - cg_start) / (double) cg_freq;
-}
 
 /* calc the Piece_ts current fall */
 static double cg_calc_fall() {
 	/* measure of current time since programs start */
-	double current_time = cg_elapsed_time();
+	double current_time = cou_elapsed_time();
 	/* calculate the passed time since last measure in a fraction of a second */
 	double second_fraction = (double) (current_time - cg_fall_mea_old_time);
 	/* calculate the value of incrementing y */
@@ -682,32 +647,6 @@ static unsigned short cg_found_full_lines() {
 		return FALSE;
 }
 
-void cg_limit_fps() {
-	// optional: limit frame rate
-	const float TARGET_FRAMETIME = 1000.0f / cg_target_fps; // 16.67 ms bei 60 FPS
-	if (cg_frametime < TARGET_FRAMETIME) {
-		SDL_Delay((Uint32) (TARGET_FRAMETIME - cg_frametime));
-	}
-}
-
-void cg_calc_fps() {
-	cg_now = SDL_GetPerformanceCounter();
-
-	cg_delta_time_start = (double) (cg_now - cg_start) / (double) cg_freq;
-	cg_delta_time_frame = (double) (cg_now - cg_frame_now) / (double) cg_freq;
-
-	cg_sec = (int) cg_delta_time_start;
-
-	if (cg_sec >= cg_oldsec + 1) {
-		cg_frametime = (double) ((1.0f / (double) cg_frame));
-		cg_frametime_ms_shown = cg_frametime * cg_unit;
-		cg_oldsec = cg_sec;
-		cg_sec = 0;
-		cg_fps = cg_frame;
-		cg_frame = 0;
-	}
-}
-
 static void cg_check_level() {
 
 	int reset_speed = FALSE;
@@ -772,10 +711,10 @@ static void cg_main_loop() {
 	/* loop until exit game or other main game state */
 	while (cg_game_state == ST_CORE_GAME) {
 
-		cg_frame++;
-		cg_calc_fps();
+		cou_inc_frame();
+		cou_calc_fps();
 		if (limit_fps_flag) {
-			cg_limit_fps();
+			cou_limit_fps();
 		}
 
 		/* check for game over state */
@@ -795,7 +734,7 @@ static void cg_main_loop() {
 			if (cg_found_full_lines()) {
 				/* and the doom-timer till markup of line(s) is over... */
 				cg_toi = ((SDL_GetPerformanceCounter() - moment_of_interest1)
-						/ cg_freq) * SEC_UNIT;
+						/ cou_get_freq()) * SEC_UNIT;
 				printf("TOW : %d\n", cg_toi);
 				if (cg_toi >= IMPLODING_TIME) {
 					/* ... let them implode. */
@@ -830,7 +769,7 @@ static void cg_main_loop() {
 					moment_of_interest2 = SDL_GetPerformanceCounter();
 
 					time_gone = ((moment_of_interest2 - moment_of_interest1)
-							/ cg_freq) * SEC_UNIT;
+							/ cou_get_freq()) * SEC_UNIT;
 					printf("time_gone since collision below : %f\n", time_gone);
 					/* if LAST_MOVE_WAIT ms are gone... */
 					if (time_gone > LAST_MOVE_WAIT) {

@@ -15,6 +15,7 @@
 #include "S_SDL3_Rendering.h"
 #include "S_Shape_Manager.h"
 #include "S_Texture_Manager.h"
+#include "S_FPS_Counter.h"
 
 #include <libgen.h>
 
@@ -126,6 +127,9 @@ void mg_run() {
 		mg_quit();
 		return;
 	}
+
+	//init frame-counter
+	cou_init();
 
 	/* new random seed */
 	srand(time(NULL));

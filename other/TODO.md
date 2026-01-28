@@ -8,6 +8,7 @@ TODO for version 0.9 alpha :
 * keyboard-delay is poor at the moment - make it better and fast! +++> DONE
 * pressing enter in core game should park the piece.
 * switch to fullscreen 800x600 +++> DONE
+* central function for limiting the fps
 
 BUGS :
 
