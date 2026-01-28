@@ -5,6 +5,7 @@
 #include "D_Common.h"
 #include "D_fonts.h"
 #include "S_SDL3_Rendering.h"
+#include "S_FPS_Counter.h"
 
 static int mm_game_state;
 static int mm_exit_flag;
@@ -69,10 +70,19 @@ static void mm_main_loop() {
 
 	mm_init();
 
+	int limit_fps_flag = LIMIT_FPS;
+
 	while (mm_game_state == ST_MAIN_MENU) {
-		mm_render();
+
+		cou_inc_frame();
+		cou_calc_fps();
+		if (limit_fps_flag) {
+			cou_limit_fps();
+		}
 
 		mm_dispatch_keyboard_events();
+
+		mm_render();
 	}
 }
 
@@ -158,6 +168,12 @@ static void mm_render() {
 	default:
 		break;
 	}
+
+	/* if activated, show fps-counter */
+	if (mm_flag_fps) {
+		cou_print_fps();
+	}
+
 
 	sdla_present_buffer();
 }

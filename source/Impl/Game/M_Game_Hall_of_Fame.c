@@ -10,6 +10,7 @@
 #include "D_fonts.h"
 #include "S_Quit.h"
 #include "S_SDL3_Rendering.h"
+#include "S_FPS_Counter.h"
 
 static int hof_exit_flag;
 static int hof_game_state;
@@ -299,7 +300,16 @@ static void hof_main_loop() {
 
 	print_hof_table();
 
+	int limit_fps_flag = LIMIT_FPS;
+
 	while (!hof_exit_flag && hof_game_state == ST_HALL_OF_FAME) {
+
+		cou_inc_frame();
+		cou_calc_fps();
+		if (limit_fps_flag) {
+			cou_limit_fps();
+		}
+
 		hof_dispatch_keyboard_events();
 		hof_core_render();
 	}
@@ -414,6 +424,9 @@ static void hof_core_render() {
 		y += YSPACEING;
 		i++;
 	}
-
+	/* if activated, show fps-counter */
+	if (hof_flag_fps) {
+		cou_print_fps();
+	}
 	sdla_present_buffer();
 }

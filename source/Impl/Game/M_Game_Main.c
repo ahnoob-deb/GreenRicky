@@ -125,7 +125,6 @@ static void cg_core_render(void);
 static void cg_piece_render(Piece_t *p_pce);
 static void cg_map_render(MapData_t *p_map);
 static void cg_render_stats(void);
-static void cg_print_fps(void);
 
 static void cg_render_next_piece(void);
 
@@ -212,10 +211,6 @@ static int cg_init() {
 	cg_spawn_new_piece(&cg_next_piece);
 
 	return TRUE;
-}
-
-static void cg_print_fps() {
-	sdla_printf(580, 430, 3, "FPS            : %d", cou_get_fps());
 }
 
 /* render a Piece_t to screen. */
@@ -878,7 +873,7 @@ static void cg_core_render() {
 
 	/* if activated, show fps-counter */
 	if (cg_flag_fps) {
-		cg_print_fps();
+		cou_print_fps();
 	}
 	/* print the current stats. */
 	cg_render_stats();

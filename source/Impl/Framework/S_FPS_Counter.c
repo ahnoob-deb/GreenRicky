@@ -1,6 +1,7 @@
 #include "D_Common.h"
 
 #include "S_FPS_Counter.h"
+#include "S_SDL3_Rendering.h"
 
 #include <SDL3/SDL.h>
 
@@ -56,6 +57,9 @@ void cou_init() {
 	cou_start = SDL_GetPerformanceCounter();
 }
 
+void cou_print_fps() {
+	sdla_printf(FPS_POS_X, FPS_POS_Y, 3, "FPS            : %d", cou_fps);
+}
 
 
 void cou_calc_fps() {
