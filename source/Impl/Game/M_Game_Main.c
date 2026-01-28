@@ -98,6 +98,7 @@ static void cg_clear_full_lines(void);
 static void cg_let_line_fade(unsigned int p_y);
 static void cg_map_delete_line(unsigned int p_y);
 static void cg_map_tumble_lines(unsigned int p_above_y);
+static void cg_check_level(void);
 
 /* an array of the full lines marked for imploding */
 static int cg_full_lines[MAX_FULL_LINES];
@@ -225,8 +226,8 @@ static int cg_init() {
 	/* game is not over yet */
 	cg_game_over_flag = 0;
 
-	cg_current_speed = PIECE_FALL_PER_SECOND;
-	cg_reset_speed = PIECE_FALL_PER_SECOND;
+	cg_current_speed = L1_FALL_PER_SECOND;
+	cg_reset_speed = L1_FALL_PER_SECOND;
 
 	/* reset the array of full lines */
 	cg_clear_full_lines();
@@ -565,9 +566,10 @@ static void cg_implode_full_lines() {
 	 multiplied by SCORE_FAC_FOUR_LINES, so its rewarding to
 	 destroy four lines at once, even if it is dangerous */
 	if (count_lines == MAX_FULL_LINES)
-		sco *= SCORE_FAC_FOUR_LINES;
+		/* update the score statistics */
+		sco += SCORE_FOUR_LINES;
 
-	/* update the score statistics */
+
 	cg_stats.score += sco;
 
 	/* clear the array of "full_lines" now */
@@ -706,6 +708,49 @@ void cg_calc_fps() {
 	}
 }
 
+static void cg_check_level() {
+
+	int reset_speed=FALSE;
+
+	if ((cg_stats.level<=6) && (cg_stats.score > LEVEL6_BORDER)) {
+		cg_reset_speed = L7_FALL_PER_SECOND;
+		cg_stats.level = 7;
+		printf("level=7\n");
+		reset_speed = TRUE;
+	} else if ((cg_stats.level<=5) && (cg_stats.score > LEVEL5_BORDER)) {
+		cg_reset_speed = L6_FALL_PER_SECOND;
+		cg_stats.level = 6;
+		printf("level=6\n");
+		reset_speed = TRUE;
+	} else if ((cg_stats.level<=4) && (cg_stats.score > LEVEL4_BORDER)) {
+		cg_reset_speed = L5_FALL_PER_SECOND;
+		cg_stats.level = 5;
+		printf("level=5\n");
+		reset_speed = TRUE;
+	} else if ((cg_stats.level<=3) && (cg_stats.score > LEVEL3_BORDER)) {
+		cg_reset_speed = L4_FALL_PER_SECOND;
+		cg_stats.level = 4;
+		printf("level=4\n");
+		reset_speed = TRUE;
+	} else if ((cg_stats.level<=2) && (cg_stats.score > LEVEL2_BORDER)) {
+		cg_reset_speed = L3_FALL_PER_SECOND;
+		cg_stats.level = 3;
+		printf("level=3\n");
+		reset_speed = TRUE;
+	} else if ((cg_stats.level==1) && (cg_stats.score > LEVEL1_BORDER)) {
+		cg_reset_speed = L2_FALL_PER_SECOND;
+		cg_stats.level = 2;
+		printf("level=2\n");
+		reset_speed = TRUE;
+	}
+
+	if (reset_speed) {
+	    printf("reseting speed\n");
+		cg_current_speed=cg_reset_speed;
+	}
+
+}
+
 /* The core games main loop, called by the game manager. */
 static void cg_main_loop() {
 	/* reset the core-game stats and values ... */
@@ -735,6 +780,7 @@ static void cg_main_loop() {
 
 		/* check for game over state */
 		cg_check_game_over();
+		cg_check_level();
 
 		/* if not game over ... */
 		if (!cg_game_over_flag) {
@@ -796,20 +842,6 @@ static void cg_main_loop() {
 
 						/* then, switch to the next Piece_t. */
 						cg_switch_next_piece();
-
-						if (cg_stats.score > LEVEL_BORDER1) {
-							cg_current_speed = L2_FALL_PER_SECOND;
-							cg_stats.level = 2;
-						}
-						if (cg_stats.score > LEVEL_BORDER2) {
-							cg_current_speed = L3_FALL_PER_SECOND;
-							cg_stats.level = 3;
-						}
-						if (cg_stats.score > LEVEL_BORDER3) {
-							cg_current_speed = L4_FALL_PER_SECOND;
-							cg_stats.level = 4;
-						}
-
 					}
 				}
 				/* if the Piece_t is not yet marked for landing but collides... */
@@ -982,7 +1014,7 @@ static void cg_dispatch_keyboard_events() {
 			printf("CORE-GAME-DISPATCH-EVENT KEYDOWN ::: %d\n", event.key.key);
 
 			if (event.key.key == SDLK_DOWN) {
-				cg_current_speed=cg_reset_speed;
+				cg_current_speed = cg_reset_speed;
 			}
 		}
 	}

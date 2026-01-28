@@ -33,9 +33,9 @@
 #define DEBUG_LEVEL DEBUG_VERBOSE
 
 /* Dimensions of the Cetris-Window */
-#define WINDOW_WIDTH 1360
-#define WINDOW_HEIGHT 768
-#define FULLSCREEN TRUE
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+#define FULLSCREEN FALSE
 #define TARGET_FPS 60
 
 
@@ -73,7 +73,7 @@
 
 #define SCORE_PER_PARK 1
 #define SCORE_PER_LINE 10
-#define SCORE_FAC_FOUR_LINES 4
+#define SCORE_FOUR_LINES 100
 
 /* Dimensions of the game Pieces */
 /* width , in blocks, of a Piece */
@@ -125,15 +125,22 @@
 /* Exit key is ESCAPE key (27 in ASCII) */
 #define K_EXIT K_ESCAPE
 
-#define LEVEL_BORDER1 500
-#define LEVEL_BORDER2 1000
-#define LEVEL_BORDER3 1500
+#define LEVEL1_BORDER 10
+#define LEVEL2_BORDER 20
+#define LEVEL3_BORDER 30
+#define LEVEL4_BORDER 40
+#define LEVEL5_BORDER 50
+#define LEVEL6_BORDER 60
 
 /* Piece falling with 1.5 Pixels per Second */
-#define PIECE_FALL_PER_SECOND 3.0f
+#define L1_FALL_PER_SECOND 3.0f
 #define L2_FALL_PER_SECOND 4.0f
 #define L3_FALL_PER_SECOND 5.0f
-#define L4_FALL_PER_SECOND 6.0f
+#define L4_FALL_PER_SECOND 5.5f
+#define L5_FALL_PER_SECOND 6.0f
+#define L6_FALL_PER_SECOND 6.3f
+#define L7_FALL_PER_SECOND 6.5f
+
 
 /* The initial move-factor of a falling peace, following the factor when down-key is
  pressed. */
