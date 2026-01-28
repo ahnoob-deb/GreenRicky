@@ -198,21 +198,6 @@ void sdla_draw_free(double p_x, double p_y, unsigned int p_color) {
 	DRAW_START_Y + drawy, &piece_col[p_color], ALPHA_SOLID);
 }
 
-int sdla_process_events() {
-
-	SDL_Event event;
-
-	if (SDL_PollEvent(&event)) {
-		if (event.type == SDL_EVENT_QUIT) {
-			return EV_INSTANT_QUIT;
-		} else if (event.type == SDL_EVENT_KEY_DOWN) {
-
-			return (event.key.key);
-		}
-	}
-	return EV_NO_EVENT;
-}
-
 void sdla_printf(const int p_x, const int p_y, const int p_color,
 		const char *p_message, ...) {
 	char buffer_text[SIZE_TXT_BUFFER] = { 0 };

@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H 1
 
+#include <stdint.h>
+
 /* Project name and version information */
 #define WORKINGNAME "Green Ricky"
 #define VERSION "0.8.0"
@@ -136,7 +138,7 @@
 /* The initial move-factor of a falling peace, following the factor when down-key is
  pressed. */
 #define NORM_MOVE_FACTOR 1
-#define MAX_MOVE_FACTOR 16
+#define MAX_MOVE_SPEED 24.0f
 
 #define ALPHA_SOLID 255
 

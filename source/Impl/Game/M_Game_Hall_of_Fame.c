@@ -30,7 +30,7 @@ static unsigned int hof_score;
 
 static void hof_main_loop(void);
 
-static void hof_dispatch_core_events(int p_ev);
+static void hof_dispatch_keyboard_events(void);
 static void hof_core_render(void);
 
 static void hof_init(unsigned int p_score);
@@ -300,7 +300,7 @@ static void hof_main_loop() {
 	print_hof_table();
 
 	while (!hof_exit_flag && hof_game_state == ST_HALL_OF_FAME) {
-		hof_dispatch_core_events(sdla_process_events());
+		hof_dispatch_keyboard_events();
 		hof_core_render();
 	}
 
@@ -308,77 +308,82 @@ static void hof_main_loop() {
 
 }
 
-static void hof_dispatch_core_events(int p_ev) {
+static void hof_dispatch_keyboard_events() {
 
-	if (p_ev != EV_NO_EVENT) {
+	SDL_Event event;
 
-		printf("HOF-DISPATCH-EVENT ::: %d\n", p_ev);
-		printf("HOF-EDIT ::: %d\n", hof_edit);
-		printf("FIRST_LETTER_SET ::: %d\n", hof_first_letter_set);
-
-		if (p_ev == SDLK_ESCAPE) {
-			hof_game_state = ST_MAIN_MENU;
-			return;
-		}
-		if (p_ev == EV_INSTANT_QUIT) {
+	if (SDL_PollEvent(&event)) {
+		if (event.type == SDL_EVENT_QUIT) {
 			hof_game_state = ST_EXIT;
-			return;
-		}
-		if (p_ev == SDLK_F10) {
-			hof_flag_fps = !hof_flag_fps;
-			return;
-		}
-		/* TYPING */
-		if (hof_edit) {
-			if (p_ev == SDLK_RETURN) {
-				if (hof_first_letter_set) {
-					hof_edit = FALSE;
-					save_highscore();
-				}
+		} else if (event.type == SDL_EVENT_KEY_DOWN) {
+
+			printf("HOF-DISPATCH-EVENT ::: %d\n", event.key.key);
+			printf("HOF-EDIT ::: %d\n", hof_edit);
+			printf("FIRST_LETTER_SET ::: %d\n", hof_first_letter_set);
+
+			if (event.key.key == SDLK_ESCAPE) {
+				hof_game_state = ST_MAIN_MENU;
 				return;
 			}
-			if (p_ev == SDLK_SPACE) {
-				if (hof_first_letter_set) {
-					if (hof_letter_index < MAX_NAME_LEN) {
-						printf("adding space at %d\n", hof_letter_index);
-						hof_data[hof_change_index]->name[hof_letter_index++] =
-								' ';
+			if (event.key.key == SDLK_F10) {
+				hof_flag_fps = !hof_flag_fps;
+				return;
+			}
+			// TYPING
+			if (hof_edit) {
+				if (event.key.key == SDLK_RETURN) {
+					if (hof_first_letter_set) {
+						hof_edit = FALSE;
+						save_highscore();
 					}
+					return;
 				}
-				return;
-			}
-			if (p_ev == SDLK_BACKSPACE) {
-				if (hof_letter_index > 0) {
-					printf("removing char at %d\n", hof_letter_index - 1);
-					hof_data[hof_change_index]->name[--hof_letter_index] = '\0';
-				} else
-					hof_first_letter_set = FALSE;
-				return;
-			}
-			switch (p_ev) {
-			case (SDLK_TAB):
-			case (SDLK_LCTRL):
-			case (SDLK_RCTRL):
-			case (SDLK_LALT):
-			case (SDLK_RALT):
-			case (SDLK_LSHIFT):
-			case (SDLK_RSHIFT):
-			case (SDLK_CAPSLOCK):
-				printf("HOF-DISPATCH-EVENT ::: KEYMOD pressed\n");
-				return;
-				break;
-			}
-			if (((p_ev >= (int) SDLK_0) && (p_ev <= (int) SDLK_9))
-					|| ((p_ev >= (int) SDLK_A) && (p_ev <= (int) SDLK_Z))) {
-				printf("adding printable char at %d\n", hof_letter_index);
-				if (hof_letter_index < MAX_NAME_LEN) {
-					hof_data[hof_change_index]->name[hof_letter_index++] = p_ev;
-					hof_first_letter_set = TRUE;
+				if (event.key.key == SDLK_SPACE) {
+					if (hof_first_letter_set) {
+						if (hof_letter_index < MAX_NAME_LEN) {
+							printf("adding space at %d\n", hof_letter_index);
+							hof_data[hof_change_index]->name[hof_letter_index++] =
+									' ';
+						}
+					}
+					return;
+				}
+				if (event.key.key == SDLK_BACKSPACE) {
+					if (hof_letter_index > 0) {
+						printf("removing char at %d\n", hof_letter_index - 1);
+						hof_data[hof_change_index]->name[--hof_letter_index] =
+								'\0';
+					} else
+						hof_first_letter_set = FALSE;
+					return;
+				}
+				switch (event.key.key) {
+				case (SDLK_TAB):
+				case (SDLK_LCTRL):
+				case (SDLK_RCTRL):
+				case (SDLK_LALT):
+				case (SDLK_RALT):
+				case (SDLK_LSHIFT):
+				case (SDLK_RSHIFT):
+				case (SDLK_CAPSLOCK):
+					printf("HOF-DISPATCH-EVENT ::: KEYMOD pressed\n");
+					return;
+					break;
+				}
+				if (((event.key.key >= (int) SDLK_0) && (event.key.key <= (int) SDLK_9))
+						|| ((event.key.key >= (int) SDLK_A) && (event.key.key <= (int) SDLK_Z))) {
+					printf("adding printable char at %d\n", hof_letter_index);
+					if (hof_letter_index < MAX_NAME_LEN) {
+						hof_data[hof_change_index]->name[hof_letter_index++] =
+								event.key.key;
+						hof_first_letter_set = TRUE;
+					}
 				}
 			}
 		}
 	}
 }
+
 
 static void hof_core_render() {
 	sdla_clear_buffer();

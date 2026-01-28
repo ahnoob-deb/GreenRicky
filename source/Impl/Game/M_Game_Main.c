@@ -80,12 +80,10 @@ static unsigned int cg_collis_det_info;
 static void cg_spawn_new_piece(Piece_t *pce);
 static void cg_park_piece(void);
 static void cg_cur_piece_rotate();
-static double cg_calc_fall(int p_move_factor);
-
-/* move factor of the falling Piece_t */
-static int cg_move_factor;
+static double cg_calc_fall();
 
 static double cg_current_speed;
+static double cg_reset_speed;
 
 static void cg_switch_next_piece();
 
@@ -108,14 +106,14 @@ static int cg_full_lines_index;
 static int cg_toi;
 static int cg_impalpha;
 
-
 /***************************************************/
 /* Event management.                               */
 /***************************************************/
 
 /* Dispatch of the events delivered by the Multi-Media-
  Manager like SDL3 */
-static void cg_dispatch_core_events(int p_ev);
+//static void cg_dispatch_core_events(int p_ev);
+static void cg_dispatch_keyboard_events(void);
 
 /***************************************************/
 /* Some render-functions.                          */
@@ -155,7 +153,6 @@ static double cg_elapsed_time();
 
 /* old time of measure of the fall of the Piece_t */
 static double cg_fall_mea_old_time;
-
 
 /***************************************************/
 /* FPS DATA                                        */
@@ -225,13 +222,11 @@ static int cg_init() {
 	/* reset time measurement variables */
 	//cg_moment_of_interest1 = SDL_GetPerformanceCounter();
 	//cg_moment_of_interest2 = cg_moment_of_interest1;
-
 	/* game is not over yet */
 	cg_game_over_flag = 0;
 
-	cg_move_factor = NORM_MOVE_FACTOR;
-	cg_current_speed=PIECE_FALL_PER_SECOND;
-
+	cg_current_speed = PIECE_FALL_PER_SECOND;
+	cg_reset_speed = PIECE_FALL_PER_SECOND;
 
 	/* reset the array of full lines */
 	cg_clear_full_lines();
@@ -293,7 +288,7 @@ static void cg_map_render(MapData_t *p_map) {
 
 	int drawx = 0;
 	int drawy = 0;
-	int percent=0;
+	int percent = 0;
 
 	for (drawy = 0; drawy < MAP_HEIGHT; drawy++) {
 		for (drawx = 0; drawx < MAP_WIDTH; drawx++) {
@@ -307,10 +302,11 @@ static void cg_map_render(MapData_t *p_map) {
 				sdla_draw_free(p_map->x + drawx, p_map->y + drawy,
 						p_map->color);
 			} else if (value_of_matrix == IMPLODING) {
-				percent=cg_toi/(IMPLODING_TIME/100);
-				cg_impalpha=ALPHA_SOLID-((ALPHA_SOLID/100)*percent);
+				percent = cg_toi / (IMPLODING_TIME / 100);
+				cg_impalpha = ALPHA_SOLID - ((ALPHA_SOLID / 100) * percent);
 				printf("ALPHA : %d\n", cg_impalpha);
-				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, 0, cg_impalpha);
+				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, 0,
+						cg_impalpha);
 			}
 		}
 	}
@@ -418,8 +414,8 @@ static int cg_collision_detection(int p_direction, double p_add_y) {
 
 		if (cg_current_piece.sh_data[p_direction]->matrix[index] > FREE) {
 			/* calculate point of interest in the map
-			   dont forget : the Piece_t's x and y coordinates are
-			   relative in the maps field. */
+			 dont forget : the Piece_t's x and y coordinates are
+			 relative in the maps field. */
 
 			/* check if Piece_t overlaps with another Piece_t in the map */
 			if (cg_poi_is_block(index, 0, 0, p_direction)) {
@@ -457,14 +453,13 @@ static double cg_elapsed_time() {
 }
 
 /* calc the Piece_ts current fall */
-static double cg_calc_fall(int p_move_factor) {
+static double cg_calc_fall() {
 	/* measure of current time since programs start */
 	double current_time = cg_elapsed_time();
 	/* calculate the passed time since last measure in a fraction of a second */
 	double second_fraction = (double) (current_time - cg_fall_mea_old_time);
 	/* calculate the value of incrementing y */
-	double fall_y_axis = p_move_factor *
-	cg_current_speed * second_fraction;
+	double fall_y_axis = cg_current_speed * second_fraction;
 
 	/* save time of last measure */
 	cg_fall_mea_old_time = current_time;
@@ -492,7 +487,6 @@ static void cg_check_full_lines() {
 
 	/* for time measurements where it is needed */
 	//double moment_of_interest1;
-
 	for (y = 0; y < cg_map_data.height; y++) {
 		unsigned short line_is_full = 1;
 		for (x = 0; x < cg_map_data.width; x++) {
@@ -722,11 +716,10 @@ static void cg_main_loop() {
 	int limit_fps_flag = LIMIT_FPS;
 
 	/* for time measurements where it is needed */
-	double moment_of_interest1=SDL_GetPerformanceCounter();
-	double moment_of_interest2=moment_of_interest1;
+	double moment_of_interest1 = SDL_GetPerformanceCounter();
+	double moment_of_interest2 = moment_of_interest1;
 
-
-	int reset_factor=NORM_MOVE_FACTOR;
+	//int reset_factor = NORM_MOVE_FACTOR;
 
 	printf("entering core loop...\n");
 	printf("game state is : %d\n", cg_game_state);
@@ -746,11 +739,12 @@ static void cg_main_loop() {
 		/* if not game over ... */
 		if (!cg_game_over_flag) {
 
-			cg_move_factor = reset_factor;
+			//cg_move_factor = reset_factor;
 
 			/* check keys pressed and dispatch the delivered events */
 			/* ignore the keycode, its not needed here. */
-			cg_dispatch_core_events(sdla_process_events());
+			//cg_dispatch_core_events(sdla_process_events());
+			cg_dispatch_keyboard_events();
 
 			/* if there are full lines to destroy ... */
 			if (cg_found_full_lines()) {
@@ -764,10 +758,9 @@ static void cg_main_loop() {
 			}
 
 			/* calc the collision info */
-			fall_y = cg_calc_fall(cg_move_factor);
+			fall_y = cg_calc_fall();
 			cg_collis_det_info = cg_collision_detection(
 					cg_current_piece.direction, fall_y);
-
 
 			/* if there is no collision below : move the Piece_t down... */
 			if ((cg_collis_det_info & COLL_BELOW) != COLL_BELOW) {
@@ -788,8 +781,8 @@ static void cg_main_loop() {
 					/* check time gone since ready_for_landing */
 					moment_of_interest2 = SDL_GetPerformanceCounter();
 
-					time_gone = ((moment_of_interest2
-							- moment_of_interest1) / cg_freq) * SEC_UNIT;
+					time_gone = ((moment_of_interest2 - moment_of_interest1)
+							/ cg_freq) * SEC_UNIT;
 					printf("time_gone since collision below : %f\n", time_gone);
 					/* if LAST_MOVE_WAIT ms are gone... */
 					if (time_gone > LAST_MOVE_WAIT) {
@@ -804,17 +797,17 @@ static void cg_main_loop() {
 						/* then, switch to the next Piece_t. */
 						cg_switch_next_piece();
 
-						if (cg_stats.score>LEVEL_BORDER1) {
-							cg_current_speed=L2_FALL_PER_SECOND;
-							cg_stats.level=2;
+						if (cg_stats.score > LEVEL_BORDER1) {
+							cg_current_speed = L2_FALL_PER_SECOND;
+							cg_stats.level = 2;
 						}
-						if (cg_stats.score>LEVEL_BORDER2) {
-							cg_current_speed=L3_FALL_PER_SECOND;
-							cg_stats.level=3;
+						if (cg_stats.score > LEVEL_BORDER2) {
+							cg_current_speed = L3_FALL_PER_SECOND;
+							cg_stats.level = 3;
 						}
-						if (cg_stats.score>LEVEL_BORDER3) {
-							cg_current_speed=L4_FALL_PER_SECOND;
-							cg_stats.level=4;
+						if (cg_stats.score > LEVEL_BORDER3) {
+							cg_current_speed = L4_FALL_PER_SECOND;
+							cg_stats.level = 4;
 						}
 
 					}
@@ -854,7 +847,7 @@ static void cg_render_next_piece() {
 	size_t index = 0;
 
 	sdla_printf_tex2(87, 140, 3, "NEXT");
-	sdla_printf_tex2(67, 140+YSPACEING, 3, "PIECE");
+	sdla_printf_tex2(67, 140 + YSPACEING, 3, "PIECE");
 
 	for (index = 0; index < PIECE_WIDTH * PIECE_HEIGHT; index++) {
 
@@ -876,14 +869,20 @@ static void cg_render_stats() {
 	sdla_printf_tex2(570, 230, 3, "STATISTICS");
 
 	/* rows */
-	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5, "Rows destroyed : %d", cg_stats.rows_destroyed);
+	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5,
+			"Rows destroyed : %d", cg_stats.rows_destroyed);
 	/* rows */
-	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+STATISTICS_LINE_SPACING, 5, "Pieces landed  : %d",
+	sdla_printf(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING, 5, "Pieces landed  : %d",
 			cg_stats.count_pieces_landed);
 	/* score */
-	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+2*STATISTICS_LINE_SPACING, 5, "Total Score    : %d", cg_stats.score);
+	sdla_printf(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + 2 * STATISTICS_LINE_SPACING, 5,
+			"Total Score    : %d", cg_stats.score);
 	/* level */
-	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+3*STATISTICS_LINE_SPACING, 5, "Level          : %d", cg_stats.level);
+	sdla_printf(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + 3 * STATISTICS_LINE_SPACING, 5,
+			"Level          : %d", cg_stats.level);
 }
 
 /* Here, the state of the core game will be drawn to screen */
@@ -894,7 +893,7 @@ static void cg_core_render() {
 	sdla_render_texture(mt_search_texture(HOOK_INGAME_SCREEN_MASK), 0.0f, 0.0f);
 
 	sdla_printf_tex2(361, 40, 3, "GREEN");
-	sdla_printf_tex2(341, 40+YSPACEING, 3, "RICKY");
+	sdla_printf_tex2(341, 40 + YSPACEING, 3, "RICKY");
 
 	/* then, add the map ... */
 	cg_map_render(&cg_map_data);
@@ -914,69 +913,77 @@ static void cg_core_render() {
 }
 
 /* dispatch the events, delivered by the SDL3-Keyboard-Scan */
-static void cg_dispatch_core_events(int p_ev) {
+static void cg_dispatch_keyboard_events() {
 
-	if (p_ev != EV_NO_EVENT) {
+	SDL_Event event;
 
-		printf("CORE-GAME-DISPATCH-EVENT ::: %d\n", p_ev);
-
-		if (p_ev == SDLK_SPACE) {
-			// check for collision of current and next directions shape
-			int next_dir = gal_piece_next_direction(&cg_current_piece);
-			int collis_det_info_cur = cg_collision_detection(
-					cg_current_piece.direction, 0.0f);
-			int collis_det_info_nxt = cg_collision_detection(next_dir, 0.0f);
-
-			// if no collision with current Piece_t...
-			if ((collis_det_info_cur & COLL_ALL) != COLL_ALL) {
-				// ... if next shape does not collide ...
-				if ((collis_det_info_nxt & COLL_ALL) != COLL_ALL) {
-					// Space is pressed : rotate the Piece_t if theres no collision below.
-					cg_cur_piece_rotate();
-				}
-			}
-
-			return;
-		}
-		if (p_ev == SDLK_RETURN) {
-			printf("RETURN BEHAVIOR UNDEFINED FOR NOW!\n");
-			return;
-		}
-		if (p_ev == SDLK_LEFT) {
-			// Left arrow is pressed, and left side is not blocked, move Piece_t left
-			if ((cg_collis_det_info & COLL_LEFT) != COLL_LEFT) {
-				gal_piece_move(&cg_current_piece, -1, 0);
-			}
-			return;
-		}
-		if (p_ev == SDLK_RIGHT) {
-			// Right arrow is pressed, and right side is not blocked, move Piece right
-			if ((cg_collis_det_info & COLL_RIGHT) != COLL_RIGHT) {
-				gal_piece_move(&cg_current_piece, 1, 0);
-			}
-			return;
-		}
-		if (p_ev == SDLK_DOWN) {
-			// If Down Arrow is pressed, increment the move factor...
-			cg_move_factor = MAX_MOVE_FACTOR;
-			return;
-		}
-		if (p_ev == SDLK_F10) {
-			// F10 turns FPS-Counter on/off...
-			cg_flag_fps = !cg_flag_fps;
-			return;
-		}
-		if (p_ev == SDLK_ESCAPE) {
-			// Escape key pressed, means in core game : back to main menu
-			cg_game_state = ST_MAIN_MENU;
-
-			return;
-		}
-		if (p_ev == EV_INSTANT_QUIT) {
-			// Instant quit means, quit as fast as possible
+	if (SDL_PollEvent(&event)) {
+		if (event.type == SDL_EVENT_QUIT) {
 			cg_game_state = ST_EXIT;
-			return;
-		}
+		} else if (event.type == SDL_EVENT_KEY_DOWN) {
 
+			printf("CORE-GAME-DISPATCH-EVENT KEYDOWN ::: %d\n", event.key.key);
+
+			if (event.key.key == SDLK_SPACE) {
+				// check for collision of current and next directions shape
+				int next_dir = gal_piece_next_direction(&cg_current_piece);
+				int collis_det_info_cur = cg_collision_detection(
+						cg_current_piece.direction, 0.0f);
+				int collis_det_info_nxt = cg_collision_detection(next_dir,
+						0.0f);
+
+				// if no collision with current Piece_t...
+				if ((collis_det_info_cur & COLL_ALL) != COLL_ALL) {
+					// ... if next shape does not collide ...
+					if ((collis_det_info_nxt & COLL_ALL) != COLL_ALL) {
+						// Space is pressed : rotate the Piece_t if theres no collision below.
+						cg_cur_piece_rotate();
+					}
+				}
+
+				return;
+			}
+			if (event.key.key == SDLK_RETURN) {
+				printf("RETURN BEHAVIOR UNDEFINED FOR NOW!\n");
+				return;
+			}
+			if (event.key.key == SDLK_LEFT) {
+				// Left arrow is pressed, and left side is not blocked, move Piece_t left
+				if ((cg_collis_det_info & COLL_LEFT) != COLL_LEFT) {
+					gal_piece_move(&cg_current_piece, -1, 0);
+				}
+				return;
+			}
+			if (event.key.key == SDLK_RIGHT) {
+				// Right arrow is pressed, and right side is not blocked, move Piece right
+				if ((cg_collis_det_info & COLL_RIGHT) != COLL_RIGHT) {
+					gal_piece_move(&cg_current_piece, 1, 0);
+				}
+				return;
+			}
+			if (event.key.key == SDLK_DOWN) {
+				// If Down Arrow is pressed, increment the move factor...
+				cg_current_speed = MAX_MOVE_SPEED;
+				return;
+			}
+			if (event.key.key == SDLK_F10) {
+				// F10 turns FPS-Counter on/off...
+				cg_flag_fps = !cg_flag_fps;
+				return;
+			}
+			if (event.key.key == SDLK_ESCAPE) {
+				// Escape key pressed, means in core game : back to main menu
+				cg_game_state = ST_MAIN_MENU;
+
+				return;
+			}
+		} else if (event.type == SDL_EVENT_KEY_UP) {
+
+			printf("CORE-GAME-DISPATCH-EVENT KEYDOWN ::: %d\n", event.key.key);
+
+			if (event.key.key == SDLK_DOWN) {
+				cg_current_speed=cg_reset_speed;
+			}
+		}
 	}
 }
