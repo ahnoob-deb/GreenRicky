@@ -1,5 +1,6 @@
 TODO for version 0.9 alpha :
 
+* all Eclipse-Warning must be fixed.
 * at Gameover show a wall falling down, then show "Game Over"
 * at quad-line-combo show "SUPERB".
 * all printf-calls must be replaced by a log-function
