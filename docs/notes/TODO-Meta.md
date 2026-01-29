@@ -1,10 +1,14 @@
 TODO for version 0.9 alpha :
 
+* at Gameover show a wall falling down, then show "Game Over"
+* at quad-line-combo show "SUPERB".
 * all printf-calls must be replaced by a log-function
 * different patterns in the pieces like in the gameboy-color-version.
-* all stats must be displayed with the new font.
+* all stats must be displayed with the new font, FPS with sdl-debug-printer.
 * change piece-colors to Game Boy Color Tetris-DX-colorscheme +++> DONE
-* calculation of type of next piece must become better (Classic "Randomizer" System (NES) --- see docs/notes/Calculation-of-next-piece.md) +++> DONE
+* calculation of type of next piece must become better 
+  (Classic "Randomizer" System (NES) 
+  --- see docs/notes/Calculation-of-next-piece.md) +++> DONE
 * pressing enter in core game should drop the piece. +++> DONE
 * remove ALL memory leaks  +++> DONE
 * better selfmade font - letters from leadingedge?! +++> DONE
