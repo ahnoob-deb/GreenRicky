@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* Project name and version information */
-#define WORKINGNAME "GREEN TEA"
+#define WORKINGNAME "TETROMANIA"
 #define VERSION "0.8.0"
 
 /* Main programmers name and gitHub information */

@@ -891,8 +891,8 @@ static void cg_core_render() {
 	/* render the ingame background image */
 	sdla_render_texture(mt_search_texture(HOOK_INGAME_SCREEN_MASK), 0.0f, 0.0f);
 
-	sdla_printf_tex2(361, 40, 3, "GREEN");
-	sdla_printf_tex2(341, 40 + YSPACEING, 3, "TEA");
+	sdla_printf_tex2(361, 40, 3, "TETRO");
+	sdla_printf_tex2(341, 40 + YSPACEING, 3, "MANIA");
 
 	/* then, add the map ... */
 	cg_map_render(&cg_map_data);

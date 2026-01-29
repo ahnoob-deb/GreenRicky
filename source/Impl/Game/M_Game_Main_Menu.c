@@ -138,8 +138,8 @@ static void mm_render() {
 	int startx = 320;
 	int starty = 182;
 
-	sdla_printf_tex2(290, 35, 3, "GREEN");
-	sdla_printf_tex2(330, 35 + YSPACEING, 3, "TEA");
+	sdla_printf_tex2(290, 35, 3, "TETRO");
+	sdla_printf_tex2(330, 35 + YSPACEING, 3, "MANIA");
 
 	sdla_printf_tex2(startx, starty, 2, "NEW GAME");
 	sdla_printf_tex2(startx, starty + 2 * YSPACEING, 2, "OPTIONS");
