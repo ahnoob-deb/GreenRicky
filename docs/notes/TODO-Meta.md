@@ -16,7 +16,7 @@ TODO PRIO 1 :
 TODO PRIO 2 :
 **************************************************
 * main_loop : some things still : TODO :
-  * at Gameover show a wall falling down, then show "GAME OVER" : TODO
+  * at Gameover show a wall is falling down, then show "GAME OVER" : TODO
   * at quad-line-combo show "SUPERB". : TODO
 
 * Next-Piece-Calculation :
@@ -26,7 +26,6 @@ TODO PRIO 2 :
 * all Eclipse-Warning have to be fixed. : TODO
 
 * different patterns in the pieces similar to the gameboy-color-version. : TODO
-* all stats must be displayed with the new font, FPS with sdl-debug-printer. : TODO
 * implement Game-Over-state correctly : TODO
 * implement a more general time measurement for timing events like sounds- 
   and graphics-effects : TODO
@@ -45,6 +44,8 @@ BUILD PROCESS :
 **************************************************
 DONE :
 **************************************************
+* all stats must be displayed with the new font +++> DONE
+* FPS Couner with new font. : +++> DONE
 * create a file for tracking bugs : +++> DONE
 * merge both TODO-files. : +++> DONE
 * change piece-colors to Game Boy Color Tetris-DX-colorscheme +++> DONE

@@ -869,21 +869,36 @@ static void cg_render_stats() {
 
 	sdla_printf_tex2(922, 113, 3, "STATISTICS");
 
-	/* rows */
+	// lines
 	sdla_printf_tex3(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5, transparency,
-			"LINES  : %d", cg_stats.rows_destroyed);
-	/* rows */
+			"LINES");
+	sdla_printf_tex3(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+YSPACEING, 5, transparency,
+			"%d", cg_stats.rows_destroyed);
+
+
+
+	// landed pieces
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING, 5, transparency, "PIECES : %d",
-			cg_stats.count_pieces_landed);
-	/* score */
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*3, 5, transparency,
+	"PIECES");
+
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + 3 * STATISTICS_LINE_SPACING, 5, transparency,
-			"SCORE  : %d", cg_stats.score);
-	/* level */
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*4, 5, transparency,
+	"%d", cg_stats.count_pieces_landed);
+
+	// score
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + 4 * STATISTICS_LINE_SPACING, 5, transparency,
-			"LEVEL  : %d", cg_stats.level);
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*5, 5, transparency,
+			"SCORE");
+
+	sdla_printf_tex3(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*6, 5, transparency,
+			"%d", cg_stats.score);
+
+	// level
+	sdla_printf_tex3(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*8, 5, transparency,
+			"LEVEL %d", cg_stats.level);
 }
 
 /* Here, the state of the core game will be drawn to screen */

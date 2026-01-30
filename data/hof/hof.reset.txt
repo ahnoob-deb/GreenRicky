@@ -1,6 +1,10 @@
 1024;dennisr
 1000;kent
 999;briank
+930;Karl Coyote
+900;Fritz the cat
+877;Felidae
+823;Speedy Gonzales
 800;noob
 666;CrashBandicoot
 50;Gameover
