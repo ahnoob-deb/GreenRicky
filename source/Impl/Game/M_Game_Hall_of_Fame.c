@@ -270,10 +270,10 @@ static void read_highscore() {
 			}
 
 			if (no == 0) {
-				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN-1);
+				strncpy(hof_data[i]->score, token, MAX_SCORE_LEN - 1);
 				printf("hof_data[%d]->score : %s\n", i, hof_data[i]->score);
 			} else if (no == 1) {
-				strncpy(hof_data[i]->name, token, MAX_NAME_LEN-1);
+				strncpy(hof_data[i]->name, token, MAX_NAME_LEN - 1);
 				printf("hof_data[%d]->name : %s\n", i, hof_data[i]->name);
 			}
 			printf("added[%d] : [%s]\n", no, token);
@@ -380,10 +380,12 @@ static void hof_dispatch_keyboard_events() {
 					return;
 					break;
 				}
-				if (((event.key.key >= (int) SDLK_0) && (event.key.key <= (int) SDLK_9))
-						|| ((event.key.key >= (int) SDLK_A) && (event.key.key <= (int) SDLK_Z))) {
+				if (((event.key.key >= (int) SDLK_0)
+						&& (event.key.key <= (int) SDLK_9))
+						|| ((event.key.key >= (int) SDLK_A)
+								&& (event.key.key <= (int) SDLK_Z))) {
 					printf("adding printable char at %d\n", hof_letter_index);
-					if (hof_letter_index < MAX_NAME_LEN-1) {
+					if (hof_letter_index < MAX_NAME_LEN - 1) {
 						hof_data[hof_change_index]->name[hof_letter_index++] =
 								event.key.key;
 						hof_first_letter_set = TRUE;
@@ -394,7 +396,6 @@ static void hof_dispatch_keyboard_events() {
 	}
 }
 
-
 static void hof_core_render() {
 	sdla_clear_buffer();
 
@@ -402,24 +403,28 @@ static void hof_core_render() {
 	sdla_render_texture(mt_search_texture(HOOK_HOF_SCREEN_MASK), 0.0f, 0.0f);
 
 	int i = 0;
-	int x = 90;
-	int y = 170;
-	unsigned int hof_color = 6;
+	int x = 259;
+	int y = 337;
+	unsigned int hof_color = 4;
 	unsigned int hof_cscore_color = 2;
 
-	sdla_printf_tex2(290, 60, 3, "HIGHSCORES");
+	int transparency = ALPHA_SOLID;
+
+	sdla_printf_tex3(589, 102, 3, GLOBAL_FONT_TRANSPARENCY, "HIGHSCORES");
 
 	while ((i < MAX_TOPS) && (hof_data[i] != NULL)) {
 		if ((i == hof_change_index) && hof_edit) {
 			if (strlen(hof_data[i]->score) > 0) {
-				sdla_printf_tex2(x, y, hof_cscore_color, hof_data[i]->score);
-				sdla_printf_tex2(x + 5 * 40, y, hof_cscore_color,
-						hof_data[i]->name);
+				sdla_printf_tex3(x, y, hof_cscore_color, ALPHA_SOLID,
+						hof_data[i]->score);
+				sdla_printf_tex3(x + 5 * YSPACEING, y, hof_cscore_color,
+						ALPHA_SOLID, hof_data[i]->name);
 			}
 
 		} else {
-			sdla_printf_tex2(x, y, hof_color, hof_data[i]->score);
-			sdla_printf_tex2(x + 5 * 40, y, hof_color, hof_data[i]->name);
+			sdla_printf_tex3(x, y, hof_color, transparency, hof_data[i]->score);
+			sdla_printf_tex3(x + 5 * YSPACEING, y, hof_color, transparency,
+					hof_data[i]->name);
 		}
 		y += YSPACEING;
 		i++;

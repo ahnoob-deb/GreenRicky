@@ -4,7 +4,9 @@
 #include <stdint.h>
 
 /* Project name and version information */
-#define WORKINGNAME "TETROMANIA"
+#define WORKINGNAME "GREENRICKY"
+#define HEADLINE1 "GREEN"
+#define HEADLINE2 "RICKY"
 #define VERSION "0.8.0"
 
 /* Main programmers name and gitHub information */
@@ -56,31 +58,31 @@
 
 #define RES_WIDTH 1360
 #define RES_HEIGHT 768
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1360
+#define WINDOW_HEIGHT 768
 #define FULLSCREEN TRUE
 #define TARGET_FPS 60
 
 
 #define FILE_HOF "../data/hof/hof.txt"
 
-#define BLOCK_SIZE_PX 20
+#define BLOCK_SIZE_PX 35
 
 // was 291 in draft 10
-#define DRAW_START_X 291
+#define DRAW_START_X 498
 // was 163 in draft 10
-#define DRAW_START_Y 156
+#define DRAW_START_Y 31
 
-#define DRAW_STATISTICS_START_X 567
-#define DRAW_STATISTICS_START_Y 295
+#define DRAW_STATISTICS_START_X 922
+#define DRAW_STATISTICS_START_Y 215
 #define STATISTICS_LINE_SPACING 40
 
 /* was 85 in draft 11 */
-#define NEXT_PIECE_X 96
+#define NEXT_PIECE_X 293
 /* was 250 in draft 11 */
-#define NEXT_PIECE_Y 254
+#define NEXT_PIECE_Y 190
 
-
+#define GLOBAL_FONT_TRANSPARENCY 0xBBBBBB
 
 /* where is no bricket... > FREE = bricket */
 #define FREE 0
@@ -156,12 +158,12 @@
 #define LEVEL5_BORDER 3500
 #define LEVEL6_BORDER 5000*/
 
-#define LEVEL1_BORDER 10
-#define LEVEL2_BORDER 20
-#define LEVEL3_BORDER 30
-#define LEVEL4_BORDER 40
-#define LEVEL5_BORDER 50
-#define LEVEL6_BORDER 60
+#define LEVEL1_BORDER 500
+#define LEVEL2_BORDER 1000
+#define LEVEL3_BORDER 1500
+#define LEVEL4_BORDER 2000
+#define LEVEL5_BORDER 3000
+#define LEVEL6_BORDER 4000
 
 /* Piece falling with 1.5 Pixels per Second */
 #define L1_FALL_PER_SECOND 3.0f

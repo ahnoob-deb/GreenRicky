@@ -845,8 +845,8 @@ static void cg_render_next_piece() {
 
 	size_t index = 0;
 
-	sdla_printf_tex2(87, 140, 3, "NEXT");
-	sdla_printf_tex2(67, 140 + YSPACEING, 3, "PIECE");
+	sdla_printf_tex2(310, 106, 3, "NEXT");
+	sdla_printf_tex2(310, 106 + YSPACEING, 3, "PIECE");
 
 	for (index = 0; index < PIECE_WIDTH * PIECE_HEIGHT; index++) {
 
@@ -865,22 +865,24 @@ static void cg_render_next_piece() {
 /* simply renders the current statistics to screen. */
 static void cg_render_stats() {
 
-	sdla_printf_tex2(570, 230, 3, "STATISTICS");
+	int transparency = GLOBAL_FONT_TRANSPARENCY;
+
+	sdla_printf_tex2(922, 113, 3, "STATISTICS");
 
 	/* rows */
-	sdla_printf(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5,
+	sdla_printf_tex3(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5, transparency,
 			"LINES  : %d", cg_stats.rows_destroyed);
 	/* rows */
-	sdla_printf(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING, 5, "PIECES : %d",
+	sdla_printf_tex3(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING, 5, transparency, "PIECES : %d",
 			cg_stats.count_pieces_landed);
 	/* score */
-	sdla_printf(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + 2 * STATISTICS_LINE_SPACING, 5,
+	sdla_printf_tex3(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + 3 * STATISTICS_LINE_SPACING, 5, transparency,
 			"SCORE  : %d", cg_stats.score);
 	/* level */
-	sdla_printf(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + 3 * STATISTICS_LINE_SPACING, 5,
+	sdla_printf_tex3(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + 4 * STATISTICS_LINE_SPACING, 5, transparency,
 			"LEVEL  : %d", cg_stats.level);
 }
 
@@ -891,8 +893,8 @@ static void cg_core_render() {
 	/* render the ingame background image */
 	sdla_render_texture(mt_search_texture(HOOK_INGAME_SCREEN_MASK), 0.0f, 0.0f);
 
-	sdla_printf_tex2(361, 40, 3, "TETRO");
-	sdla_printf_tex2(341, 40 + YSPACEING, 3, "MANIA");
+	sdla_printf_tex2(210, 480, 3, HEADLINE1);
+	sdla_printf_tex2(210, 480 + YSPACEING, 3, HEADLINE2);
 
 	/* then, add the map ... */
 	cg_map_render(&cg_map_data);

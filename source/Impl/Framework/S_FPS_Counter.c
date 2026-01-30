@@ -58,7 +58,8 @@ void cou_init() {
 }
 
 void cou_print_fps() {
-	sdla_printf(FPS_POS_X, FPS_POS_Y, 3, "FPS            : %d", cou_fps);
+
+	sdla_printf_tex3(FPS_POS_X, FPS_POS_Y, 3, GLOBAL_FONT_TRANSPARENCY, "FPS : %d", cou_fps);
 }
 
 

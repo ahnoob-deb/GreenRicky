@@ -37,6 +37,9 @@ void sdla_printf_tex(const int p_x, const int p_y, unsigned int p_col,
 void sdla_printf_tex2(const int p_x, const int p_y, unsigned int p_col,
 		const char *p_message, ...);
 
+void sdla_printf_tex3(const int p_x, const int p_y, unsigned int p_col, unsigned int p_alpha,
+		const char *p_message, ...);
+
 void sdla_render_rect_from_tex(MyGameTexture_t *p_tex, float p_sx1, float p_sy1,
 		float p_sx2, float p_sy2, float p_dx1, float p_dy1, float p_dx2,
 		float p_dy2);

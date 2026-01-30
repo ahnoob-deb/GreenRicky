@@ -61,7 +61,7 @@ static void init_colors() {
 	text_col[0] = COL_WHITE;          // RESERVED
 	text_col[1] = COL_LIGHTBLUE;
 	text_col[2] = COL_RED;
-	text_col[3] = COL_YELLOW;
+	text_col[3] = COL_DARKORANGE;
 	text_col[4] = COL_PURPLE;
 	text_col[5] = COL_ORANGE;
 	text_col[6] = COL_GREEN;
@@ -84,9 +84,9 @@ static void init_colors() {
 }
 
 void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
-		MyGameColor_t *col, int p_alpha) {
+		MyGameColor_t *p_col, int p_alpha) {
 
-	if (p_tex != NULL) {
+	if ((p_tex != NULL) && (p_col!=NULL)) {
 
 		SDL_FRect dst_rect;
 
@@ -97,11 +97,12 @@ void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
 
 		SDL_SetTextureBlendMode(p_tex->texture, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureAlphaMod(p_tex->texture, p_alpha);
-		SDL_SetTextureColorMod(p_tex->texture, col->R, col->G, col->B);
+		//printf("modding color : [R:%d;G:%d;B:%d]\n", p_col->R, p_col->G, p_col->B);
+		SDL_SetTextureColorMod(p_tex->texture, p_col->R, p_col->G, p_col->B);
 
 		SDL_RenderTexture(renderer, p_tex->texture, NULL, &dst_rect);
 	} else {
-		printf("WARNING : p_tex is NULL : no Rendering!");
+		printf("WARNING : p_tex or p_col is NULL : no Rendering!");
 	}
 }
 
@@ -370,6 +371,69 @@ void sdla_printf_tex2(const int p_x, const int p_y, unsigned int p_col,
 
 			sdla_render_texture_mod(tex, draw_start_x, p_y, &text_col[p_col],
 			ALPHA_SOLID);
+			draw_start_x += tex->texture->w;
+		}
+
+	}
+}
+
+void sdla_printf_tex3(const int p_x, const int p_y, unsigned int p_col, unsigned int p_alpha,
+		const char *p_message, ...) {
+	char buffer_text[SIZE_TXT_BUFFER] = { 0 };
+
+	va_list args;
+	va_start(args, p_message);
+
+	vsprintf(buffer_text, p_message, args);
+
+	va_end(args);
+
+	const char *message = buffer_text;
+
+	unsigned int r = (p_col >> 16) & 0xFF;
+	unsigned int g = (p_col >> 8) & 0xFF;
+	unsigned int b = p_col & 0xFF;
+
+	size_t index = 0;
+	//int x = 0;
+	//int y = 0;
+	int draw_start_x = p_x;
+	//int no = 0;
+	char l_image_id[255];
+	int draw = FALSE;
+
+	for (index = 0; index < strlen(message); index++) {
+		draw = FALSE;
+
+		int ch = message[index];
+		if (isdigit(ch)) {
+			//int no = ch - '0';
+
+			sprintf(l_image_id, "num0%d.png", ch);
+			//printf("tex-id is : %s\n", l_image_id);
+
+			draw = TRUE;
+
+		} else if (isalpha(ch)) {
+			int no = toupper(ch);
+
+			sprintf(l_image_id, "font0%d.png", no);
+			//printf("tex-id is : %s\n", l_image_id);
+			draw = TRUE;
+
+		} else if (isspace(ch)) {
+			draw_start_x += SPACEING;
+			draw = FALSE;
+		}
+
+		if (draw) {
+
+			MyGameTexture_t *tex = mt_search_texture(l_image_id);
+
+			SDL_SetTextureColorMod(tex->texture, r, g, b);
+
+			sdla_render_texture_mod(tex, draw_start_x, p_y, &text_col[p_col],
+			p_alpha);
 			draw_start_x += tex->texture->w;
 		}
 

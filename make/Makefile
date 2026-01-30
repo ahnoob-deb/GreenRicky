@@ -5,7 +5,7 @@ AR := ar
 SOURCE=../source
 
 # DEBUG, DEBUG-ASAN, OPTIMIZE2 or OPTIMIZE3
-MODE := OPTIMIZE3
+MODE := OPTIMIZE2
 
 # Quell- und Header-Dateien automatisch finden
 SRC := $(shell find $(SOURCE)/Impl -name '*.c')

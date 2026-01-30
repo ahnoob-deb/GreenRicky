@@ -135,34 +135,39 @@ static void mm_render() {
 	sdla_render_texture(mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF), 0.0f,
 			0.0f);
 
-	int startx = 320;
-	int starty = 182;
+	int startx = 610;
+	int starty = 386;
 
-	sdla_printf_tex2(290, 35, 3, "TETRO");
-	sdla_printf_tex2(330, 35 + YSPACEING, 3, "MANIA");
+	int transparency = GLOBAL_FONT_TRANSPARENCY;
 
-	sdla_printf_tex2(startx, starty, 2, "NEW GAME");
-	sdla_printf_tex2(startx, starty + 2 * YSPACEING, 2, "OPTIONS");
-	sdla_printf_tex2(startx - 25, starty + 4 * YSPACEING, 2, "HALL OF FAME");
-	sdla_printf_tex2(startx + 20, starty + 6 * YSPACEING, 2, "EXIT");
+	sdla_printf_tex3(630, 97, 3, transparency, HEADLINE1);
+	sdla_printf_tex3(630, 97 + YSPACEING, 3, transparency,  HEADLINE2);
+
+	sdla_printf_tex3(startx, starty, 2, transparency, "NEW GAME");
+	sdla_printf_tex3(startx, starty + 2 * YSPACEING, 2, transparency, "OPTIONS");
+	sdla_printf_tex3(startx - 25, starty + 4 * YSPACEING, 2, transparency, "HALL OF FAME");
+	sdla_printf_tex3(startx + 20, starty + 6 * YSPACEING, 2, transparency, "EXIT");
 
 	/* render, which option is chosen. */
 	switch (mm_menu_option) {
 	case MM_OPT_NEW_GAME:
-		sdla_printf_tex2(startx, starty, 3, "NEW GAME");
+		sdla_printf_tex3(startx, starty, 3, ALPHA_SOLID,
+				"NEW GAME");
 		break;
 
 	case MM_OPT_OPTIONS:
-		sdla_printf_tex2(startx, starty + 2 * YSPACEING, 3, "OPTIONS");
+		sdla_printf_tex3(startx, starty + 2 * YSPACEING, 3, ALPHA_SOLID,
+				"OPTIONS");
 		break;
 
 	case MM_OPT_HALL_OF_FAME:
-		sdla_printf_tex2(startx - 25, starty + 4 * YSPACEING, 3,
+		sdla_printf_tex3(startx - 25, starty + 4 * YSPACEING, 3, ALPHA_SOLID,
 				"HALL OF FAME");
 		break;
 
 	case MM_OPT_EXIT:
-		sdla_printf_tex2(startx + 20, starty + 6 * YSPACEING, 3, "EXIT");
+		sdla_printf_tex3(startx + 20, starty + 6 * YSPACEING, 3, ALPHA_SOLID,
+				"EXIT");
 		break;
 
 	default:

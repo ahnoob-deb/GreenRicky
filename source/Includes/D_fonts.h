@@ -5,6 +5,6 @@
 #define LETTER_MATRIX_HEIGHT 40
 
 #define SPACEING 5
-#define YSPACEING 33
+#define YSPACEING 40
 
 #endif

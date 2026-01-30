@@ -3,8 +3,8 @@
 
 #include <SDL3/SDL.h>
 
-#define FPS_POS_X 580
-#define FPS_POS_Y 30
+#define FPS_POS_X 900
+#define FPS_POS_Y 50
 
 void cou_limit_fps(void);
 void cou_calc_fps(void);
