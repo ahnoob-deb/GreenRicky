@@ -17,6 +17,7 @@
 static int cg_game_state;
 static int cg_exit_flag;
 static int cg_flag_fps;
+static int cg_flag_break;
 
 /***************************************************/
 /* MODULE INTERN VARIABLES & PROTOTYPES            */
@@ -184,6 +185,8 @@ static int cg_init() {
 	cg_stats.score = START_SCORE;
 	cg_stats.level = 1;
 
+	cg_flag_break = FALSE;
+
 	/* reset all bits of collision detection */
 	cg_collis_det_info = 0;
 
@@ -215,7 +218,7 @@ static int cg_init() {
 
 /* render a Piece_t to screen. */
 static void cg_piece_render(Piece_t *p_pce) {
-	int color = p_pce->id_no+1;
+	int color = p_pce->id_no + 1;
 	int value_of_shape = 0;
 
 	int drawx = 0;
@@ -552,14 +555,13 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 		new_shape_id = gal_shape_ids[rand_shape_no];
 
 		// if new piece is different to last...
-		if (rand_shape_no!=cg_current_piece.id_no)
+		if (rand_shape_no != cg_current_piece.id_no)
 			// ... its our new piece...
 			break;
 		printf("rolled for new piece twice...");
 	}
 
 	ShapeNode_t *sn = search_shape(new_shape_id);
-
 
 	if (sn == NULL) {
 		printf("could not find shape with id %s for Piece_t.", new_shape_id);
@@ -569,7 +571,6 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 	/* random color
 	 COLOR[0] is reserved for collapsing lines (for now) !!! */
 	//int rand_color = rand() % (COUNT_PIECE_COLORS - 1) + 1;
-
 	/* random direction of the shape */
 	int rand_direction = rand() % COUNT_DIRECTIONS;
 
@@ -587,7 +588,7 @@ static void cg_spawn_new_piece(Piece_t *pce) {
 
 static void cg_switch_next_piece() {
 	/* change the values of the Piece */
-	cg_current_piece.id_no=cg_next_piece.id_no;
+	cg_current_piece.id_no = cg_next_piece.id_no;
 	cg_current_piece.x = SPAWN_X;
 	cg_current_piece.y = SPAWN_Y;
 	//cg_current_piece.color = cg_next_piece.color;
@@ -639,7 +640,7 @@ static void cg_park_piece() {
 
 			/* write the color value into the map */
 			cg_map_data.matrix[park_y * MAP_WIDTH + park_x] =
-					cg_current_piece.id_no+1;
+					cg_current_piece.id_no + 1;
 		}
 	}
 	/* update game stats. */
@@ -753,71 +754,74 @@ static void cg_main_loop() {
 			/* ignore the keycode, its not needed here. */
 			//cg_dispatch_core_events(sdla_process_events());
 			cg_dispatch_keyboard_events();
+			if (!cg_flag_break) {
+				/* if there are full lines to destroy ... */
+				if (cg_found_full_lines()) {
+					/* and the doom-timer till markup of line(s) is over... */
+					cg_toi =
+							((SDL_GetPerformanceCounter() - moment_of_interest1)
+									/ cou_get_freq()) * SEC_UNIT;
+					printf("TOW : %d\n", cg_toi);
+					if (cg_toi >= IMPLODING_TIME) {
+						/* ... let them implode. */
+						cg_implode_full_lines();
 
-			/* if there are full lines to destroy ... */
-			if (cg_found_full_lines()) {
-				/* and the doom-timer till markup of line(s) is over... */
-				cg_toi = ((SDL_GetPerformanceCounter() - moment_of_interest1)
-						/ cou_get_freq()) * SEC_UNIT;
-				printf("TOW : %d\n", cg_toi);
-				if (cg_toi >= IMPLODING_TIME) {
-					/* ... let them implode. */
-					cg_implode_full_lines();
-
-					cg_check_level();
-				}
-			}
-
-			/* calc the collision info */
-			fall_y = cg_calc_fall();
-			cg_collis_det_info = cg_collision_detection(
-					cg_current_piece.direction, fall_y);
-
-			/* if there is no collision below : move the Piece_t down... */
-			if ((cg_collis_det_info & COLL_BELOW) != COLL_BELOW) {
-				cg_current_piece.ready_for_landing = 0;
-				gal_piece_move(&cg_current_piece, 0, fall_y);
-			}
-			/* but, if there was collision below... */
-			else {
-				/* TODO : LOGIC FOR LAST MOVE HAS A BUG SOMETIMES
-				 // BECAUSE THERE IS NO MORE COLLISION DETECTION HERE?!
-				 // SO WE DO THAT HERE -> TEST, TEST, TEST
-				 // get new collision info before the last move.
-				 cg_collis_det_info = cg_collision_detection(
-				 cg_current_piece.direction, fall_y);
-				 */
-				/* if the Piece_t is already marked for parking */
-				if (cg_current_piece.ready_for_landing) {
-					/* check time gone since ready_for_landing */
-					moment_of_interest2 = SDL_GetPerformanceCounter();
-
-					time_gone = ((moment_of_interest2 - moment_of_interest1)
-							/ cou_get_freq()) * SEC_UNIT;
-					printf("time_gone since collision below : %f\n", time_gone);
-					/* if LAST_MOVE_WAIT ms are gone... */
-					if (time_gone > LAST_MOVE_WAIT) {
-						printf("waited %f ms.\n", time_gone);
-
-						/* ... park the Piece_t in the map - finally ;) */
-						cg_park_piece();
 						cg_check_level();
-
-						/* check if there are full lines */
-						cg_check_full_lines();
-
-						/* then, switch to the next Piece. */
-						cg_switch_next_piece();
-
 					}
 				}
-				/* if the Piece_t is not yet marked for landing but collides... */
+
+				/* calc the collision info */
+				fall_y = cg_calc_fall();
+				cg_collis_det_info = cg_collision_detection(
+						cg_current_piece.direction, fall_y);
+
+				/* if there is no collision below : move the Piece_t down... */
+				if ((cg_collis_det_info & COLL_BELOW) != COLL_BELOW) {
+					cg_current_piece.ready_for_landing = 0;
+					gal_piece_move(&cg_current_piece, 0, fall_y);
+				}
+				/* but, if there was collision below... */
 				else {
-					/* mark the Piece_t for landing */
-					cg_current_piece.ready_for_landing = 1;
-					/* and measure the time - from now on
-					 we have to wait LAST_MOVE_WAIT ms */
-					moment_of_interest1 = SDL_GetPerformanceCounter();
+					/* TODO : LOGIC FOR LAST MOVE HAS A BUG SOMETIMES
+					 // BECAUSE THERE IS NO MORE COLLISION DETECTION HERE?!
+					 // SO WE DO THAT HERE -> TEST, TEST, TEST
+					 // get new collision info before the last move.
+					 cg_collis_det_info = cg_collision_detection(
+					 cg_current_piece.direction, fall_y);
+					 */
+					/* if the Piece_t is already marked for parking */
+					if (cg_current_piece.ready_for_landing) {
+						/* check time gone since ready_for_landing */
+						moment_of_interest2 = SDL_GetPerformanceCounter();
+
+						time_gone = ((moment_of_interest2 - moment_of_interest1)
+								/ cou_get_freq()) * SEC_UNIT;
+						printf("time_gone since collision below : %f\n",
+								time_gone);
+						/* if LAST_MOVE_WAIT ms are gone... */
+						if (time_gone > LAST_MOVE_WAIT) {
+							printf("waited %f ms.\n", time_gone);
+
+							/* ... park the Piece_t in the map - finally ;) */
+							cg_park_piece();
+							cg_check_level();
+
+							/* check if there are full lines */
+							cg_check_full_lines();
+
+							/* then, switch to the next Piece. */
+							cg_switch_next_piece();
+
+						}
+					}
+					/* if the Piece_t is not yet marked for landing but collides... */
+					else {
+						/* mark the Piece_t for landing */
+						cg_current_piece.ready_for_landing = 1;
+						/* and measure the time - from now on
+						 we have to wait LAST_MOVE_WAIT ms */
+						moment_of_interest1 = SDL_GetPerformanceCounter();
+					}
 				}
 			}
 			/* render all. */
@@ -835,7 +839,7 @@ static void cg_main_loop() {
 
 static void cg_render_next_piece() {
 
-	int color = cg_next_piece.id_no+1;
+	int color = cg_next_piece.id_no + 1;
 	int value_of_shape = 0;
 
 	unsigned int drawx = 0;
@@ -870,34 +874,33 @@ static void cg_render_stats() {
 	sdla_printf_tex2(922, 113, 3, "STATISTICS");
 
 	// lines
-	sdla_printf_tex3(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5, transparency,
-			"LINES");
-	sdla_printf_tex3(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y+YSPACEING, 5, transparency,
-			"%d", cg_stats.rows_destroyed);
-
-
+	sdla_printf_tex3(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5,
+			transparency, "LINES");
+	sdla_printf_tex3(DRAW_STATISTICS_START_X,
+	DRAW_STATISTICS_START_Y + YSPACEING, 5, transparency, "%d",
+			cg_stats.rows_destroyed);
 
 	// landed pieces
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*3, 5, transparency,
-	"PIECES");
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING * 3, 5, transparency,
+			"PIECES");
 
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*4, 5, transparency,
-	"%d", cg_stats.count_pieces_landed);
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING * 4, 5, transparency,
+			"%d", cg_stats.count_pieces_landed);
 
 	// score
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*5, 5, transparency,
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING * 5, 5, transparency,
 			"SCORE");
 
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*6, 5, transparency,
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING * 6, 5, transparency,
 			"%d", cg_stats.score);
 
 	// level
 	sdla_printf_tex3(DRAW_STATISTICS_START_X,
-	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING*8, 5, transparency,
+	DRAW_STATISTICS_START_Y + STATISTICS_LINE_SPACING * 8, 5, transparency,
 			"LEVEL %d", cg_stats.level);
 }
 
@@ -940,47 +943,53 @@ static void cg_dispatch_keyboard_events() {
 
 			printf("CORE-GAME-DISPATCH-EVENT KEYDOWN ::: %d\n", event.key.key);
 
-			if (event.key.key == SDLK_SPACE) {
-				// check for collision of current and next directions shape
-				int next_dir = gal_piece_next_direction(&cg_current_piece);
-				int collis_det_info_cur = cg_collision_detection(
-						cg_current_piece.direction, 0.0f);
-				int collis_det_info_nxt = cg_collision_detection(next_dir,
-						0.0f);
+			// allow this keys only when there is no break...
+			if (!cg_flag_break) {
+				if (event.key.key == SDLK_SPACE) {
+					// check for collision of current and next directions shape
+					int next_dir = gal_piece_next_direction(&cg_current_piece);
+					int collis_det_info_cur = cg_collision_detection(
+							cg_current_piece.direction, 0.0f);
+					int collis_det_info_nxt = cg_collision_detection(next_dir,
+							0.0f);
 
-				// if no collision with current Piece_t...
-				if ((collis_det_info_cur & COLL_ALL) != COLL_ALL) {
-					// ... if next shape does not collide ...
-					if ((collis_det_info_nxt & COLL_ALL) != COLL_ALL) {
-						// Space is pressed : rotate the Piece_t if theres no collision below.
-						cg_cur_piece_rotate();
+					// if no collision with current Piece_t...
+					if ((collis_det_info_cur & COLL_ALL) != COLL_ALL) {
+						// ... if next shape does not collide ...
+						if ((collis_det_info_nxt & COLL_ALL) != COLL_ALL) {
+							// Space is pressed : rotate the Piece_t if theres no collision below.
+							cg_cur_piece_rotate();
+						}
 					}
+
+					return;
 				}
 
-				return;
-			}
-			if (event.key.key == SDLK_RETURN) {
-				cg_drop_piece();
-				return;
-			}
-			if (event.key.key == SDLK_LEFT) {
-				// Left arrow is pressed, and left side is not blocked, move Piece_t left
-				if ((cg_collis_det_info & COLL_LEFT) != COLL_LEFT) {
-					gal_piece_move(&cg_current_piece, -1, 0);
+				if (event.key.key == SDLK_RETURN) {
+					cg_drop_piece();
+					return;
 				}
-				return;
-			}
-			if (event.key.key == SDLK_RIGHT) {
-				// Right arrow is pressed, and right side is not blocked, move Piece right
-				if ((cg_collis_det_info & COLL_RIGHT) != COLL_RIGHT) {
-					gal_piece_move(&cg_current_piece, 1, 0);
+
+				if (event.key.key == SDLK_LEFT) {
+					// Left arrow is pressed, and left side is not blocked, move Piece_t left
+					if ((cg_collis_det_info & COLL_LEFT) != COLL_LEFT) {
+						gal_piece_move(&cg_current_piece, -1, 0);
+					}
+					return;
 				}
-				return;
-			}
-			if (event.key.key == SDLK_DOWN) {
-				// If Down Arrow is pressed, increment the move factor...
-				cg_current_speed = MAX_MOVE_SPEED;
-				return;
+
+				if (event.key.key == SDLK_RIGHT) {
+					// Right arrow is pressed, and right side is not blocked, move Piece right
+					if ((cg_collis_det_info & COLL_RIGHT) != COLL_RIGHT) {
+						gal_piece_move(&cg_current_piece, 1, 0);
+					}
+					return;
+				}
+				if (event.key.key == SDLK_DOWN) {
+					// If Down Arrow is pressed, increment the move factor...
+					cg_current_speed = MAX_MOVE_SPEED;
+					return;
+				}
 			}
 			if (event.key.key == SDLK_F10) {
 				// F10 turns FPS-Counter on/off...
@@ -990,6 +999,15 @@ static void cg_dispatch_keyboard_events() {
 			if (event.key.key == SDLK_ESCAPE) {
 				// Escape key pressed, means in core game : back to main menu
 				cg_game_state = ST_MAIN_MENU;
+
+				return;
+			}
+			if (event.key.key == SDLK_PAUSE) {
+				// Escape key pressed, means in core game : back to main menu
+				cg_flag_break = !cg_flag_break;
+				if (!cg_flag_break) {
+					cg_fall_mea_old_time = cou_elapsed_time();
+				}
 
 				return;
 			}

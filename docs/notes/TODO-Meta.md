@@ -44,6 +44,7 @@ BUILD PROCESS :
 **************************************************
 DONE :
 **************************************************
+* implement a break of the game +++> DONE
 * all stats must be displayed with the new font +++> DONE
 * FPS Couner with new font. : +++> DONE
 * create a file for tracking bugs : +++> DONE
