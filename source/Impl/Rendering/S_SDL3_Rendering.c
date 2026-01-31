@@ -68,13 +68,13 @@ static void init_colors() {
 	text_col[7] = COL_BLUE;
 
 	piece_col[0] = COL_WHITE;         // RESERVED
-	piece_col[1] = COL_SEAGREEN;      // T
+	piece_col[1] = COL_LIGHTORANGE;      // T
 	piece_col[2] = COL_RED;           // L
 	piece_col[3] = COL_CYANBLUE;      // J
-	piece_col[4] = COL_LIGHTORANGE;   // Z
+	piece_col[4] = COL_SEAGREEN;   // Z
     piece_col[5] = COL_PURPLE;        // S
-	piece_col[6] = COL_YELLOW;        // O
-	piece_col[7] = COL_DARKORANGE;    // I
+	piece_col[6] = COL_DARKORANGE;        // O
+	piece_col[7] = COL_YELLOW;    // I
 
 
 	imp_col[0] = COL_IMP[0];
