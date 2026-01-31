@@ -79,17 +79,16 @@ static unsigned int cg_collis_det_info;
 /* Functions manipulating the Piece_ts. */
 /***************************************************/
 
+static void cg_state_update();
 static void cg_spawn_new_piece(Piece_t *pce);
 static void cg_park_piece(void);
 static void cg_cur_piece_rotate();
 static double cg_calc_fall();
+static void cg_switch_next_piece();
+static void cg_drop_piece();
 
 static double cg_current_speed;
 static double cg_reset_speed;
-
-static void cg_switch_next_piece();
-
-static void cg_drop_piece();
 
 /***************************************************/
 /* This is for checking full lines and let them implode. */
@@ -137,6 +136,9 @@ static void cg_render_next_piece(void);
 /* VARIABLES USED FOR TIME MEASUREMENT             */
 /***************************************************/
 
+// for time measurements where it is needed
+static double cg_moment_of_interest1;
+static double cg_moment_of_interest2;
 /* old time of measure of the fall of the Piece_t */
 static double cg_fall_mea_old_time;
 
@@ -715,20 +717,86 @@ static void cg_check_level() {
 
 }
 
+// This function updates the games state in every frame.
+static void cg_state_update() {
+
+	static double fall_y = 0;
+	static double time_gone = 0;
+
+	// if there are full lines to destroy ...
+	if (cg_found_full_lines()) {
+		// and the doom-timer till markup of line(s) is over...
+		cg_toi = ((SDL_GetPerformanceCounter() - cg_moment_of_interest1)
+				/ cou_get_freq()) * SEC_UNIT;
+		printf("TOW : %d\n", cg_toi);
+		if (cg_toi >= IMPLODING_TIME) {
+			// ... let them implode.
+			cg_implode_full_lines();
+
+			cg_check_level();
+		}
+	}
+
+	// calculate how far the piece moved in current time elapsed
+	fall_y = cg_calc_fall();
+	// calculate the collision info
+	cg_collis_det_info = cg_collision_detection(cg_current_piece.direction,
+			fall_y);
+
+	// if there is no collision below : move the Piece_t down...
+	if ((cg_collis_det_info & COLL_BELOW) != COLL_BELOW) {
+		cg_current_piece.ready_for_landing = 0;
+		gal_piece_move(&cg_current_piece, 0, fall_y);
+	}
+	// but, if there was collision below...
+	else {
+		// TODO : LOGIC FOR LAST MOVE HAS A BUG : SOMETIMES
+		// IT DOES NOT MENTION A COLLISION.
+		// IS IT BECAUSE THERE IS NO MORE COLLISION DETECTION HERE?!
+		// TEST WITH NEW COLLISION DATA AFTER PIECE MARKED FOR
+		// LANDING.
+
+		// if the Piece_t is already marked for parking
+		if (cg_current_piece.ready_for_landing) {
+			// check time gone since ready_for_landing
+			cg_moment_of_interest2 = SDL_GetPerformanceCounter();
+			time_gone = ((cg_moment_of_interest2 - cg_moment_of_interest1)
+					/ cou_get_freq()) * SEC_UNIT;
+			printf("time_gone since collision below : %f\n", time_gone);
+			// if LAST_MOVE_WAIT ms are gone... */
+			if (time_gone > LAST_MOVE_WAIT) {
+				printf("waited %f ms.\n", time_gone);
+				// ... park the Piece_t in the map - finally ;)
+				cg_park_piece();
+				cg_check_level();
+				// check if there are full lines
+				cg_check_full_lines();
+				// then, switch to the next Piece.
+				cg_switch_next_piece();
+			}
+		}
+		// if the Piece_t is not yet marked for landing but collides...
+		else {
+			printf("piece ready for landing...\n");
+			// mark the Piece_t for landing
+			cg_current_piece.ready_for_landing = 1;
+			// and measure the time - from now on
+			// we have to wait LAST_MOVE_WAIT ms
+			cg_moment_of_interest1 = SDL_GetPerformanceCounter();
+		}
+	}
+}
+
 /* The core games main loop, called by the game manager. */
 static void cg_main_loop() {
 	/* reset the core-game stats and values ... */
 	cg_init();
-	double time_gone = 0;
-	double fall_y = 0;
 
 	int limit_fps_flag = LIMIT_FPS;
 
-	/* for time measurements where it is needed */
-	double moment_of_interest1 = SDL_GetPerformanceCounter();
-	double moment_of_interest2 = moment_of_interest1;
+	cg_moment_of_interest1 = SDL_GetPerformanceCounter();
+	cg_moment_of_interest2 = cg_moment_of_interest1;
 
-	//int reset_factor = NORM_MOVE_FACTOR;
 
 	printf("entering core loop...\n");
 	printf("game state is : %d\n", cg_game_state);
@@ -748,81 +816,12 @@ static void cg_main_loop() {
 		/* if not game over ... */
 		if (!cg_game_over_flag) {
 
-			//cg_move_factor = reset_factor;
-
-			/* check keys pressed and dispatch the delivered events */
-			/* ignore the keycode, its not needed here. */
-			//cg_dispatch_core_events(sdla_process_events());
+			// check keys pressed and dispatch the delivered events
 			cg_dispatch_keyboard_events();
+			// If the game is not in break state.
 			if (!cg_flag_break) {
-				/* if there are full lines to destroy ... */
-				if (cg_found_full_lines()) {
-					/* and the doom-timer till markup of line(s) is over... */
-					cg_toi =
-							((SDL_GetPerformanceCounter() - moment_of_interest1)
-									/ cou_get_freq()) * SEC_UNIT;
-					printf("TOW : %d\n", cg_toi);
-					if (cg_toi >= IMPLODING_TIME) {
-						/* ... let them implode. */
-						cg_implode_full_lines();
 
-						cg_check_level();
-					}
-				}
-
-				/* calc the collision info */
-				fall_y = cg_calc_fall();
-				cg_collis_det_info = cg_collision_detection(
-						cg_current_piece.direction, fall_y);
-
-				/* if there is no collision below : move the Piece_t down... */
-				if ((cg_collis_det_info & COLL_BELOW) != COLL_BELOW) {
-					cg_current_piece.ready_for_landing = 0;
-					gal_piece_move(&cg_current_piece, 0, fall_y);
-				}
-				/* but, if there was collision below... */
-				else {
-					/* TODO : LOGIC FOR LAST MOVE HAS A BUG SOMETIMES
-					 // BECAUSE THERE IS NO MORE COLLISION DETECTION HERE?!
-					 // SO WE DO THAT HERE -> TEST, TEST, TEST
-					 // get new collision info before the last move.
-					 cg_collis_det_info = cg_collision_detection(
-					 cg_current_piece.direction, fall_y);
-					 */
-					/* if the Piece_t is already marked for parking */
-					if (cg_current_piece.ready_for_landing) {
-						/* check time gone since ready_for_landing */
-						moment_of_interest2 = SDL_GetPerformanceCounter();
-
-						time_gone = ((moment_of_interest2 - moment_of_interest1)
-								/ cou_get_freq()) * SEC_UNIT;
-						printf("time_gone since collision below : %f\n",
-								time_gone);
-						/* if LAST_MOVE_WAIT ms are gone... */
-						if (time_gone > LAST_MOVE_WAIT) {
-							printf("waited %f ms.\n", time_gone);
-
-							/* ... park the Piece_t in the map - finally ;) */
-							cg_park_piece();
-							cg_check_level();
-
-							/* check if there are full lines */
-							cg_check_full_lines();
-
-							/* then, switch to the next Piece. */
-							cg_switch_next_piece();
-
-						}
-					}
-					/* if the Piece_t is not yet marked for landing but collides... */
-					else {
-						/* mark the Piece_t for landing */
-						cg_current_piece.ready_for_landing = 1;
-						/* and measure the time - from now on
-						 we have to wait LAST_MOVE_WAIT ms */
-						moment_of_interest1 = SDL_GetPerformanceCounter();
-					}
-				}
+				cg_state_update();
 			}
 			/* render all. */
 			cg_core_render();
