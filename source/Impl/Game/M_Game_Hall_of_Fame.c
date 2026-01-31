@@ -403,8 +403,8 @@ static void hof_core_render() {
 	sdla_render_texture(mt_search_texture(HOOK_HOF_SCREEN_MASK), 0.0f, 0.0f);
 
 	int i = 0;
-	int x = 259;
-	int y = 337;
+	int x = 450;
+	int y = 325;
 	unsigned int hof_color = 4;
 	unsigned int hof_cscore_color = 2;
 

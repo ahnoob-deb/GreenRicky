@@ -52,7 +52,7 @@ DONE :
 * calculation of type of next piece must become better  +++> DONE :
    * (currently : Classic "Randomizer" System (NES))
    * see docs/notes/Calculation-of-next-piece.md
-* remove ALL memory leaks  +++> DONE
+* remove ALL memory leaks with tool : Google Address Sanitizer  +++> DONE
 * better selfmade font +++> DONE
 * add fullscreen-mode +++> DONE
 * keyboard-delay is poor at the moment - make it much better and fast! +++> DONE
@@ -96,4 +96,6 @@ TODO in NEW BRANCH(!!!) after 0.9 alpha :
 **************************************************
 TODO LATER :
 **************************************************
-* install a local bug tracking system.
+* define a theme file that can bring new masks into the game. : TODO
+  the file should also define the positions of the text-elements. : TODO
+* install a local bug tracking system. : TODO
