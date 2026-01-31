@@ -1,10 +1,10 @@
-1024;dennisr
-1000;kent
-999;briank
+3024;dennisr
+2000;kent
+1024;briank
 930;Karl Coyote
-900;Fritz the cat
-877;Felidae
-823;Speedy Gonzales
-800;noob
-666;CrashBandicoot
+550;Fritz the cat
+488;Felidae
+300;Speedy Gonzales
+233;noob
+100;CrashBandicoot
 50;Gameover
