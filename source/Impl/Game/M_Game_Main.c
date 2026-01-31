@@ -333,7 +333,7 @@ static unsigned short cg_poi_is_block(int p_index, double p_add_x,
 		return TRUE;
 
 	/* check if in point of interest is a block */
-	if (cg_map_data.matrix[y * MAP_WIDTH + x] > FREE) {
+	if ((cg_map_data.matrix[y * MAP_WIDTH + x] > FREE)) {
 		return TRUE;
 	}
 
