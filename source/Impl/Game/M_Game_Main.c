@@ -79,7 +79,7 @@ static unsigned int cg_collis_det_info;
 /* Functions manipulating the Piece_ts. */
 /***************************************************/
 
-static void cg_state_update();
+static void cg_game_update();
 static void cg_spawn_new_piece(Piece_t *pce);
 static void cg_park_piece(void);
 static void cg_cur_piece_rotate();
@@ -718,7 +718,7 @@ static void cg_check_level() {
 }
 
 // This function updates the games state in every frame.
-static void cg_state_update() {
+static void cg_game_update() {
 
 	static double fall_y = 0;
 	static double time_gone = 0;
@@ -821,7 +821,7 @@ static void cg_main_loop() {
 			// If the game is not in break state.
 			if (!cg_flag_break) {
 
-				cg_state_update();
+				cg_game_update();
 			}
 			/* render all. */
 			cg_core_render();
