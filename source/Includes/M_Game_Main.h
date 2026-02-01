@@ -4,6 +4,11 @@
 #define POI_IS_FREE 0
 #define POI_IS_BLOCKED 1
 
+#define MAX_LEN_EXTRA_TEXT 20
+#define FOUR_LINES_GRATS "SUPERB"
+#define TEXT_GAME_OVER "SUPERB"
+#define TEXT_BREAK "BREAK"
+
 /* game statistics */
 typedef struct
 {

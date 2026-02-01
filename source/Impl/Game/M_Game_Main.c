@@ -123,7 +123,7 @@ static void cg_dispatch_keyboard_events(void);
 /* Some render-functions.                          */
 /***************************************************/
 
-static void cg_core_render(void);
+static void cg_core_render(char *p_extra_text);
 static void cg_piece_render(Piece_t *p_pce);
 static void cg_map_render(MapData_t *p_map);
 static void cg_render_stats(void);
@@ -143,6 +143,13 @@ static double cg_moment_of_interest2;
 static double cg_fall_mea_old_time;
 
 /***************************************************/
+
+/***************************************************/
+/* VARIABLE USED FOR EXTRA INFORMATION             */
+/***************************************************/
+
+static char cg_extra_text[MAX_LEN_EXTRA_TEXT];
+
 
 /***************************************************/
 /*            +++ IMPLEMENTATION +++               */
@@ -191,6 +198,7 @@ static int cg_init() {
 
 	/* reset all bits of collision detection */
 	cg_collis_det_info = 0;
+	cg_extra_text[0]='\0';
 
 	/* reset time measurement variables */
 	//cg_moment_of_interest1 = SDL_GetPerformanceCounter();
@@ -722,9 +730,18 @@ static void cg_game_update() {
 
 	static double fall_y = 0;
 	static double time_gone = 0;
+	int clines=0;
 
 	// if there are full lines to destroy ...
 	if (cg_found_full_lines()) {
+
+		for (int i=0; i<MAX_FULL_LINES;i++)
+			if (cg_full_lines[i]>NO_LINE)
+				clines++;
+
+		if (clines==MAX_FULL_LINES)
+			strncpy(cg_extra_text, FOUR_LINES_GRATS, MAX_LEN_EXTRA_TEXT-1);
+
 		// and the doom-timer till markup of line(s) is over...
 		cg_toi = ((SDL_GetPerformanceCounter() - cg_moment_of_interest1)
 				/ cou_get_freq()) * SEC_UNIT;
@@ -734,6 +751,7 @@ static void cg_game_update() {
 			cg_implode_full_lines();
 
 			cg_check_level();
+			cg_extra_text[0]='\0';
 		}
 	}
 
@@ -792,6 +810,7 @@ static void cg_main_loop() {
 	/* reset the core-game stats and values ... */
 	cg_init();
 
+	double time_gone=0;
 	int limit_fps_flag = LIMIT_FPS;
 
 	cg_moment_of_interest1 = SDL_GetPerformanceCounter();
@@ -811,10 +830,10 @@ static void cg_main_loop() {
 		}
 
 		/* check for game over state */
-		cg_check_game_over();
+		if (cg_game_over_flag==0) cg_check_game_over();
 
 		/* if not game over ... */
-		if (!cg_game_over_flag) {
+		if (cg_game_over_flag==0) {
 
 			// check keys pressed and dispatch the delivered events
 			cg_dispatch_keyboard_events();
@@ -824,11 +843,23 @@ static void cg_main_loop() {
 				cg_game_update();
 			}
 			/* render all. */
-			cg_core_render();
-		} else /* if (cg_game_over_flag) */
-		{
+			cg_core_render(cg_extra_text);
+		} else if (cg_game_over_flag==1) {
+
+			strncpy(cg_extra_text, TEXT_GAME_OVER, MAX_LEN_EXTRA_TEXT-1);
+			cg_moment_of_interest2 = SDL_GetPerformanceCounter();
+			time_gone = ((cg_moment_of_interest2 - cg_moment_of_interest1)
+					/ cou_get_freq()) * SEC_UNIT;
+			printf("time_gone since game over : %f\n", time_gone);
+			// if LAST_MOVE_WAIT ms are gone... */
+			if (time_gone > GAME_OVER_DELAY) {
+				cg_game_over_flag = 2;
+				cg_extra_text[0]='\0';
+			}
+			cg_core_render(cg_extra_text);
+		} else if (cg_game_over_flag==2) {
 			/* Change the state of the game to state HALL OF FAME
-			 This will end THIS main while-loop in next loop. */
+			 This will end THIS main-loop in next loop. */
 			cg_game_state = ST_HALL_OF_FAME;
 		}
 	}
@@ -904,14 +935,14 @@ static void cg_render_stats() {
 }
 
 /* Here, the state of the core game will be drawn to screen */
-static void cg_core_render() {
+static void cg_core_render(char *p_extra_text) {
 	sdla_clear_buffer();
 
 	/* render the ingame background image */
 	sdla_render_texture(mt_search_texture(HOOK_INGAME_SCREEN_MASK), 0.0f, 0.0f);
 
-	sdla_printf_tex2(210, 480, 3, HEADLINE1);
-	sdla_printf_tex2(210, 480 + YSPACEING, 3, HEADLINE2);
+	sdla_printf_tex3(210, 480, 3, ALPHA_SOLID, HEADLINE1);
+	sdla_printf_tex3(210, 480 + YSPACEING, 3, ALPHA_SOLID, HEADLINE2);
 
 	/* then, add the map ... */
 	cg_map_render(&cg_map_data);
@@ -919,14 +950,20 @@ static void cg_core_render() {
 	if (cg_current_piece.display)
 		cg_piece_render(&cg_current_piece);
 
-	/* if activated, show fps-counter */
-	if (cg_flag_fps) {
-		cou_print_fps();
-	}
 	/* print the current stats. */
 	cg_render_stats();
-
 	cg_render_next_piece();
+
+	if (p_extra_text)
+		sdla_printf_tex3(DRAW_START_X+3*BLOCK_SIZE_PX,
+				DRAW_START_Y+6*BLOCK_SIZE_PX,
+				4, ALPHA_SOLID,
+				p_extra_text);
+
+	/* if activated, show fps-counter */
+	if (cg_flag_fps)
+		cou_print_fps();
+
 	sdla_present_buffer();
 }
 
@@ -1003,9 +1040,11 @@ static void cg_dispatch_keyboard_events() {
 			}
 			if (event.key.key == SDLK_PAUSE) {
 				// Escape key pressed, means in core game : back to main menu
+				strncpy(cg_extra_text, TEXT_BREAK, MAX_LEN_EXTRA_TEXT-1);
 				cg_flag_break = !cg_flag_break;
 				if (!cg_flag_break) {
 					cg_fall_mea_old_time = cou_elapsed_time();
+					cg_extra_text[0]='\0';
 				}
 
 				return;

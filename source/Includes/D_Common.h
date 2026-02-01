@@ -140,7 +140,7 @@
 #define LAST_MOVE_WAIT 300
 
 /* Lines implode after this time */
-#define IMPLODING_TIME 1000
+#define IMPLODING_TIME 1500
 
 #define LIMIT_FPS TRUE
 
