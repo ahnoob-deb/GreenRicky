@@ -348,7 +348,7 @@ static unsigned short cg_poi_is_block(int p_index, double p_add_x,
 	return FALSE;
 }
 
-/* the central collision detection. the heart of the tetris game.
+/* the central collision detection. the heart of the game.
  * This function checks for collisions between the Piece_t and the map
  * If a collision is detected at all borders, the Piece_t is set to not moveable.
  *
