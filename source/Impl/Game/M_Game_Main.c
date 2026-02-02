@@ -954,11 +954,14 @@ static void cg_core_render(char *p_extra_text) {
 	cg_render_stats();
 	cg_render_next_piece();
 
-	if (p_extra_text)
-		sdla_printf_tex3(DRAW_START_X+3*BLOCK_SIZE_PX,
-				DRAW_START_Y+6*BLOCK_SIZE_PX,
+	if (p_extra_text) {
+	    int len = strlen(p_extra_text);
+	    int dx=(DRAW_START_X+(10*BLOCK_SIZE_PX/2))-(((len/2)-1)*BLOCK_SIZE_PX);
+		sdla_printf_tex3(dx,
+				DRAW_START_Y+7*BLOCK_SIZE_PX,
 				4, ALPHA_SOLID,
 				p_extra_text);
+	}
 
 	/* if activated, show fps-counter */
 	if (cg_flag_fps)
