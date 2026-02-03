@@ -808,7 +808,7 @@ static void cg_game_update() {
 /* The core games main loop, called by the game manager. */
 static void cg_main_loop() {
 	/* reset the core-game stats and values ... */
-	cg_init();
+	//cg_init();
 
 	double time_gone=0;
 	int limit_fps_flag = LIMIT_FPS;

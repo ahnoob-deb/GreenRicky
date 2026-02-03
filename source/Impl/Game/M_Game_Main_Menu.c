@@ -68,7 +68,7 @@ static void mm_switch_menu(int inc_factor) {
 static void mm_main_loop() {
 	printf("entering main menu...\n");
 
-	mm_init();
+	//mm_init();
 
 	int limit_fps_flag = LIMIT_FPS;
 
