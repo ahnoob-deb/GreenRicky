@@ -1,9 +1,5 @@
 ![Logo](./other/screenshots/GR2026-02-04-small.png)
 
-see live here : 
-
-<a href="https://www.youtube.com/watch?v=LbVMudgEQzY" target="_blank" rel="noopener noreferrer">GreenRicky on Youtube</a>
-
 # Green Ricky pre-alpha version 0.8.0
 ## currently only tested with :
 
