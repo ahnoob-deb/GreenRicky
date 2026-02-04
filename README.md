@@ -2,7 +2,7 @@
 
 see live here : 
 
-[GreenRicky on Youtube](https://www.youtube.com/watch?v=LbVMudgEQzY){:target="_blank"}
+<a href="https://www.youtube.com/watch?v=LbVMudgEQzY" target="_blank" rel="noopener noreferrer">GreenRicky on Youtube</a>
 
 # Green Ricky pre-alpha version 0.8.0
 ## currently only tested with :
