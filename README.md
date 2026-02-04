@@ -1,3 +1,9 @@
+![Logo](./other/screenshots/GR2026-02-04-small.png)
+
+see live here : 
+
+[GreenRicky on Youtube](https://www.youtube.com/watch?v=LbVMudgEQzY)
+
 # Green Ricky pre-alpha version 0.8.0
 ## currently only tested with :
 
