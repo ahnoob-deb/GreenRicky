@@ -5,6 +5,7 @@ OVERALL :
 **************************************************
 TODO PRIO 1 :
 **************************************************
+* Tag the current version online at github.com
 * update documentation for doxygen : TODO 
 * update comments in code : TODO 
 * document the project. : TODO
