@@ -15,6 +15,9 @@ TODO PRIO 1 :
 **************************************************
 TODO PRIO 2 :
 **************************************************
+
+* In the game modules (M_Game_*) : group variables that belong together in well-named structures
+
 * main_loop : some things still : TODO :
   * at Gameover show a wall is falling down, then show "GAME OVER" : TODO
   * at quad-line-combo show "SUPERB". : TODO
