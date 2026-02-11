@@ -69,6 +69,6 @@ obj:
 # Clean-Target
 .PHONY: clean
 clean:
-	rm -rfv obj/* $(OUTPUT)
-	rm -rfv obj
-	rm -fv gmon.out
+	@rm -rf obj/* $(OUTPUT)
+	@rm -rf obj
+	@rm -f gmon.out
