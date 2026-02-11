@@ -1,8 +1,8 @@
-/**************************************************************************
- * This is the Framework of the program.
+/***********************************************************************
+ * The Framework of the game.
  *
- * It initializes all data and  combines all the
- * following modules to one single program :
+ * It initializes all data and combines all the
+ * following modules and services to one single program :
  *
  * M_Game_Framework.c          // Framework
  *     S_FPS_Counter.c         // Service "FPS-Counter"
@@ -19,28 +19,27 @@
  *     S_Texture_Manager.c     // Service "Texture-Manager" which organizes all the
  *                             // the textures used in the game
  *
- ******************************************************************************/
-
-#include "M_Game_Framework.h"
+ **********************************************************************/
 
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
 
-#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
-#include "D_Common.h"
+// libgen.h for use of basename(...)
+#include <libgen.h>
+
+
+#include "M_Game_Framework.h"
 #include "M_Game_Hall_of_Fame.h"
 #include "M_Game_Main.h"
 #include "M_Game_Main_Menu.h"
-#include "S_Game_Objects.h"
 #include "S_Quit.h"
 #include "S_SDL3_Rendering.h"
 #include "S_Shape_Manager.h"
 #include "S_Texture_Manager.h"
 #include "S_FPS_Counter.h"
 
-#include <libgen.h>
+
 
 unsigned short mg_exit_flag; // wether the user wants to quit the game
 unsigned short mg_flag_fps; // wether the fps counter is turned on
@@ -63,14 +62,6 @@ static void mg_quit(void); // quit's the game
  *
  **************************************************************************/
 static int mg_load_textures() {
-	// FONTS :
-
-	mt_load_texture(FILE_FONT_DATA_01, HOOK_FONT_DATA_01, NULL);
-
-	if (mt_search_texture(HOOK_FONT_DATA_01) == NULL) {
-		printf("could not load fonts!\n");
-		quit_game_with_log_error("data management error.\n", 1);
-	}
 
 	// MAIN MENU :
 
@@ -203,8 +194,8 @@ void mg_run() {
  *
  **************************************************************************/
 int mg_boot() {
-	printf("mg_boot() : booting MultiMediaLayer...");
-	if (sdla_boot_mmAPI_SDL() == FALSE)
+	printf("mg_boot() : booting MultiMediaLayer (MML) ...");
+	if (sdla_boot_SDL() == FALSE)
 		return FALSE;
 	else
 		printf("SDL3 ok.\n");

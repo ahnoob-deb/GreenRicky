@@ -131,7 +131,7 @@ int gfx_init_hooks() {
 	return TRUE;
 }
 
-int sdla_boot_mmAPI_SDL() {
+int sdla_boot_SDL() {
 
 	SDL_Init(SDL_INIT_VIDEO);
 
