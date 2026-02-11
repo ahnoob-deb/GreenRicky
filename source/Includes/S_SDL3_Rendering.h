@@ -19,7 +19,7 @@ void sdla_render_texture_mod(MyGameTexture_t *p_tex, float p_x, float p_y,
 void sdla_render_texture(MyGameTexture_t *p_tex, float p_x, float p_y);
 SDL_Window* sdla_get_window(void);
 SDL_Renderer* sdla_get_renderer(void);
-int sdla_boot_mmAPI_SDL(void);
+int sdla_boot_SDL(void);
 int sdla_process_events(void);
 void sdla_clear_buffer(void);
 void sdla_present_buffer(void);

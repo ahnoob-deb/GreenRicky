@@ -623,7 +623,7 @@ static void cg_drop_piece() {
 	}
 
 	cg_current_piece.y += i - 1.0;
-	cg_park_piece();
+	//cg_park_piece();
 }
 
 /* land the Piece_t when it collides.

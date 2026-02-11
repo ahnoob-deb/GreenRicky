@@ -103,6 +103,7 @@ TODO in NEW BRANCH(!!!) after 0.9 alpha :
 **************************************************
 TODO LATER :
 **************************************************
+* define a compressed file format for the data in the game (data in game *.dig)
 * define a theme file that can bring new masks into the game. : TODO
   the file should also define the positions of the text-elements. : TODO
 * install a local bug tracking system. : TODO

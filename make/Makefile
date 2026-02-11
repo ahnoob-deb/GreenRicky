@@ -15,7 +15,7 @@ DEP := $(OBJ:.o=.d)
 # Compiler-Flags
 CFLAGS := -I $(SOURCE)/Includes -std=c18 -Wall -Wextra -Werror 
 CFLAGS += -Wmissing-prototypes -Werror=missing-prototypes
-LFLAGS := -lSDL3 -lSDL3_image -lm 
+LFLAGS := -lSDL3 -lSDL3_image
 
 ifeq ($(MODE), DEBUG)
 	CFLAGS += -g -pg -DDEBUG
@@ -69,6 +69,6 @@ obj:
 # Clean-Target
 .PHONY: clean
 clean:
-	rm -rf obj/* $(OUTPUT)
-	rm -r obj
-	rm gmon.out
+	@rm -rf obj/* $(OUTPUT)
+	@rm -rf obj
+	@rm -f gmon.out
