@@ -1,5 +1,5 @@
 /***********************************************************************
- * The Framework of the game.
+ * This is the Framework of the game.
  *
  * It initializes all data and combines all the
  * following modules and services to one single program :
@@ -25,7 +25,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-// libgen.h for use of basename(...)
+/* libgen.h for use of basename(...) */
 #include <libgen.h>
 
 

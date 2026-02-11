@@ -1,7 +1,6 @@
 /***********************************************************************
  * This is the service "Quit" of the game. It defines functions for
  * orderly termination of the program in every case of error.
- *
  **********************************************************************/
 
 #include <stdio.h>

@@ -7,11 +7,9 @@
  *
  * If you want you can limit to a specific target fps
  * by using function void cou_limit_fps().
- *
- **********************************************************************/
+  **********************************************************************/
 
 #include "D_Common.h"
-
 #include "S_FPS_Counter.h"
 #include "S_SDL3_Rendering.h"
 
@@ -39,7 +37,7 @@ static int cou_unit = 1000; // 1000 = milliseconds; 1000000 would be nanoseconds
 
 /**************************************************************************
  *
- * Return the count per second of the high resolution counter.
+ * Returns the count per second of the high resolution counter.
  *
  **************************************************************************/
 Uint64 cou_get_freq(void) {
@@ -57,7 +55,7 @@ void cou_inc_frame() {
 
 /**************************************************************************
  *
- * Return frames per second.
+ * Returns the number of frames per second.
  *
  **************************************************************************/
 int cou_get_fps() {
@@ -66,7 +64,7 @@ int cou_get_fps() {
 
 /**************************************************************************
  *
- * Get the timestamp of starting time..
+ * Get the timestamp of starting time.
  *
  **************************************************************************/
 Uint64 cou_get_start_ts() {
@@ -75,7 +73,7 @@ Uint64 cou_get_start_ts() {
 
 /**************************************************************************
  *
- * Get the elapsed time since starting time.
+ * Get the elapsed time since timestamp of starting time.
  *
  **************************************************************************/
 double cou_elapsed_time() {
@@ -97,7 +95,7 @@ void cou_init() {
 
 /**************************************************************************
  *
- * Draw the frames per second to screen using SDL wrapper module.
+ * Draws the frames per second to screen using the SDL wrapper module.
  *
  **************************************************************************/
 void cou_print_fps() {

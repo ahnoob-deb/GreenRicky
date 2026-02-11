@@ -1,3 +1,7 @@
+/***********************************************************************
+ * This is the interface of the Framework of the game.
+ **********************************************************************/
+
 #ifndef M_GAME_FRAMEWORK_H
 #define M_GAME_FRAMEWORK_H 1
 
