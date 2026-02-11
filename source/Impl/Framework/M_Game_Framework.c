@@ -1,3 +1,26 @@
+/**************************************************************************
+ * This is the Framework of the program.
+ *
+ * It initializes all data and  combines all the
+ * following modules to one single program :
+ *
+ * M_Game_Framework.c          // Framework
+ *     S_FPS_Counter.c         // Service "FPS-Counter"
+ *     S_Quit.c                // Service "Quit" - it quit's the program in a clean way
+ *     M_Game_Main_Menu.c      // Module Main Menu
+ *     M_Game_Main.c           // Module of the Core Game
+ *     M_Game_Hall_of_Fame.c   // Module for the Highscore-List
+ *     S_Game_Objects.c        // Service "Game-Objects" which delivers functions for
+ *                             // manipulation of game objects (structures)
+ *     S_SDL3_Rendering.c      // Service "SDL3" - a wrapper-module for some functions
+ *                             // needing SDL3-API
+ *     S_Shape_Manager.c       // Service "Shape-Manager" which organizes all of
+ *                             // the Pieces shapes used in the game
+ *     S_Texture_Manager.c     // Service "Texture-Manager" which organizes all the
+ *                             // the textures used in the game
+ *
+ ******************************************************************************/
+
 #include "M_Game_Framework.h"
 
 #include <stdio.h>
@@ -19,26 +42,28 @@
 
 #include <libgen.h>
 
-unsigned short mg_exit_flag;
-unsigned short mg_flag_fps;
-int mg_main_game_state;
+unsigned short mg_exit_flag; // wether the user wants to quit the game
+unsigned short mg_flag_fps; // wether the fps counter is turned on
+int mg_main_game_state;  // indicates the status of the game
 
 /***************************************************/
 /* BOOTING                                         */
 /***************************************************/
 
-static int mg_boot(void);
-static int mg_init(void);
-/* add all MyGameTextures to a tree of MyGameTextures */
-static int mg_load_textures(void);
-/*static int mg_load_texture(char *p_filename, char *p_tex_hook_id,
-		MyGameTexture_t **p_hook);*/
+static int mg_boot(void);  // boots the SDL-Layer
+static int mg_init(void);  // initializes the game
+static int mg_load_textures(void); /* add all needed Textures
+                                      to a tree of MyGameTextures */
 
-static void mg_quit(void);
+static void mg_quit(void); // quit's the game
 
-/* Load the MyGameTextures for the core game. */
+/**************************************************************************
+ *
+ * Load the Textures for the game.
+ *
+ **************************************************************************/
 static int mg_load_textures() {
-	/* FONTS : */
+	// FONTS :
 
 	mt_load_texture(FILE_FONT_DATA_01, HOOK_FONT_DATA_01, NULL);
 
@@ -47,7 +72,7 @@ static int mg_load_textures() {
 		quit_game_with_log_error("data management error.\n", 1);
 	}
 
-	/* MAIN MENU : */
+	// MAIN MENU :
 
 	mt_load_texture(FILE_MMENU_SCREEN_MASK_OFF, HOOK_MMENU_SCREEN_MASK_OFF,
 	NULL);
@@ -59,7 +84,7 @@ static int mg_load_textures() {
 		quit_game_with_log_error("data management error.\n", 1);
 	}
 
-	/* HALL OF FAME : */
+	// HALL OF FAME :
 
 	mt_load_texture(FILE_HOF_SCREEN_MASK, HOOK_HOF_SCREEN_MASK, NULL);
 
@@ -68,7 +93,7 @@ static int mg_load_textures() {
 		quit_game_with_log_error("data management error.\n", 1);
 	}
 
-	/* INGAME : */
+	// INGAME :
 
 	mt_load_texture(FILE_INGAME_SCREEN_MASK, HOOK_INGAME_SCREEN_MASK, NULL);
 	mt_load_texture(FILE_CELL_BLOCK_MASK, HOOK_CELL_BLOCK_MASK, NULL);
@@ -81,12 +106,12 @@ static int mg_load_textures() {
 		quit_game_with_log_error("data management error.\n", 1);
 	}
 
-	/* ALPHA INGAME */
+	// ALPHA INGAME
 
 	mt_load_texture(FILE_CELL_BLOCK_MASK_ALPHA, HOOK_CELL_BLOCK_MASK_ALPHA,
 			NULL);
 
-	/* FONTS */
+	// FONTS
 	// LETTERS (font0xx.png)
 	for (int i=65;i<=90;i++) {
         char letter_image_id[255];
@@ -117,6 +142,11 @@ static int mg_load_textures() {
 	return TRUE;
 }
 
+/**************************************************************************
+ *
+ * Start and run the Framework.
+ *
+ **************************************************************************/
 void mg_run() {
 
 	if (mg_boot()) {
@@ -128,10 +158,10 @@ void mg_run() {
 		return;
 	}
 
-	//init frame-counter
+	// init frame-counter
 	cou_init();
 
-	/* new random seed */
+	// new random seed
 	srand(time(NULL));
 
 	printf("game running now...\n");
@@ -145,12 +175,12 @@ void mg_run() {
 		score = START_SCORE;
 
 		if (mg_main_game_state == ST_MAIN_MENU) {
-			// Main loop of Main Menu
+			// start Main Menu
 			mm_run();
 			mg_main_game_state = mm_get_game_state();
 		}
 		if (mg_main_game_state == ST_CORE_GAME) {
-			// Main loop of the core game
+			// start Core game
 			score = cg_run();
 			printf("YOUR SCORE : %u\n", score);
 			mg_main_game_state = cg_get_game_state();
@@ -158,7 +188,7 @@ void mg_run() {
 					mg_main_game_state);
 		}
 		if (mg_main_game_state == ST_HALL_OF_FAME) {
-			// Main loop of the Hall of Fame
+			// start Hall of Fame
 			hof_run(score);
 			mg_main_game_state = hof_get_game_state();
 		}
@@ -167,6 +197,11 @@ void mg_run() {
 	mg_quit();
 }
 
+/**************************************************************************
+ *
+ * Boots the SDL-API
+ *
+ **************************************************************************/
 int mg_boot() {
 	printf("mg_boot() : booting MultiMediaLayer...");
 	if (sdla_boot_mmAPI_SDL() == FALSE)
@@ -178,11 +213,11 @@ int mg_boot() {
 
 	mt_init();
 
-	//mg_start = SDL_GetPerformanceCounter();
-
-	/* load the Textures. */
+	// load the Textures.
 	mg_load_textures();
 
+	// remember the textures, so you don't have to search them again with
+	// the texture manager
 	gfx_init_hooks();
 
 	printf("ok.\n");
@@ -191,7 +226,11 @@ int mg_boot() {
 
 	return TRUE;
 }
-
+/**************************************************************************
+ *
+ * Initializes the Framework
+ *
+ **************************************************************************/
 static int mg_init() {
 
 	printf("init game manager...\n");
@@ -200,12 +239,17 @@ static int mg_init() {
 	mg_flag_fps = FALSE;
 	mg_main_game_state = ST_MAIN_MENU;
 
-	/* new random seed */
+	// new random seed
 	srand(time(NULL));
 
 	return TRUE;
 }
 
+/**************************************************************************
+ *
+ * Quit's the game in a clean way.
+ *
+ **************************************************************************/
 static void mg_quit() {
 	prepare_quit_game();
 }
