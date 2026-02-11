@@ -47,6 +47,8 @@ BUILD PROCESS :
 **************************************************
 DONE :
 **************************************************
+* fit the resolution to FULL-HD (pictures and sprites will be changed later,
+  for now the old resolution is set as logical resolution. +++> DONE
 * Tag the current version 0.8.0 at github.com +++> DONE
 * implement a break of the game +++> DONE
 * all stats must be displayed with the new font +++> DONE
