@@ -5,7 +5,6 @@ OVERALL :
 **************************************************
 TODO PRIO 1 :
 **************************************************
-* Tag the current version online at github.com
 * update documentation for doxygen : TODO 
 * update comments in code : TODO 
 * document the project. : TODO
@@ -48,6 +47,7 @@ BUILD PROCESS :
 **************************************************
 DONE :
 **************************************************
+* Tag the current version 0.8.0 at github.com +++> DONE
 * implement a break of the game +++> DONE
 * all stats must be displayed with the new font +++> DONE
 * FPS Couner with new font. : +++> DONE
