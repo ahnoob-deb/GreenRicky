@@ -216,8 +216,8 @@ int mg_boot() {
 	// load the Textures.
 	mg_load_textures();
 
-	// remember the textures, so you don't have to search them again with
-	// the texture manager
+	// remember the textures, so you don't have to search them again
+	// by using the texture manager
 	gfx_init_hooks();
 
 	printf("ok.\n");
