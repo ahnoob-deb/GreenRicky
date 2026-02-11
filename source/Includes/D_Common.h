@@ -56,8 +56,8 @@
 #define TARGET_FPS 60
 */
 
-#define RES_WIDTH 1360
-#define RES_HEIGHT 768
+#define RES_WIDTH 1920
+#define RES_HEIGHT 1080
 #define WINDOW_WIDTH 1360
 #define WINDOW_HEIGHT 768
 #define FULLSCREEN TRUE
