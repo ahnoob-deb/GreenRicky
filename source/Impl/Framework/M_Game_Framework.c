@@ -181,7 +181,7 @@ void mg_run() {
 		if (mg_main_game_state == ST_HALL_OF_FAME) {
 			// start Hall of Fame
 			hof_run(score);
-			mg_main_game_state = hof_get_game_state();
+			mg_main_game_state = hof_get_state();
 		}
 	}
 

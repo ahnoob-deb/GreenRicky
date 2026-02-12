@@ -12,6 +12,6 @@ typedef struct {
     char score[MAX_SCORE_LEN];
     char name[MAX_NAME_LEN];
 
-} HSCData;
+} HSCData_t;
 
 #endif
