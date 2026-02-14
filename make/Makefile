@@ -14,7 +14,8 @@ DEP := $(OBJ:.o=.d)
 
 # Compiler-Flags
 CFLAGS := -I $(SOURCE)/Includes -std=c18 -Wall -Wextra -Werror 
-CFLAGS += -Wmissing-prototypes -Werror=missing-prototypes
+#CFLAGS += -Wmissing-prototypes -Werror=missing-prototypes
+CFLAGS += -Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=strict-prototypes
 LFLAGS := -lSDL3 -lSDL3_image
 
 # additional flags in case of different MODE's

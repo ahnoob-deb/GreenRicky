@@ -36,12 +36,12 @@ static void gal_piece_check_map_bounds(Piece_t *p_pce);
 static void gal_shape_check_node(char *p_id);
 
 /* allocate memory for a Piece. */
-static Piece_t *gal_alloc_piece();
+static Piece_t *gal_alloc_piece(void);
 
 /* Allocate memory for a Piece. This will return a pointer to the Piece or NULL
  * in case of error.
  */
-static Piece_t *gal_alloc_piece()
+static Piece_t *gal_alloc_piece(void)
 {
     return (Piece_t *)malloc(sizeof(Piece_t));
 }
