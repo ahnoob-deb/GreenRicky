@@ -67,11 +67,10 @@ static int mg_load_textures() {
 
 	mt_load_texture(FILE_MMENU_SCREEN_MASK_OFF, HOOK_MMENU_SCREEN_MASK_OFF,
 	NULL);
-	mt_load_texture(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
+//	mt_load_texture(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
 
-	if ((mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF) == NULL)
-			|| (mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON) == NULL)) {
-		printf("could not load textures for menu!\n");
+	if (mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF) == NULL) {
+		printf("could not load textures for the background in main menu!\n");
 		quit_game_with_log_error("data management error.\n", 1);
 	}
 
