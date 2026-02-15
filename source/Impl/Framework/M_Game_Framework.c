@@ -67,11 +67,10 @@ static int mg_load_textures() {
 
 	mt_load_texture(FILE_MMENU_SCREEN_MASK_OFF, HOOK_MMENU_SCREEN_MASK_OFF,
 	NULL);
-	mt_load_texture(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
+//	mt_load_texture(FILE_MMENU_SCREEN_MASK_ON, HOOK_MMENU_SCREEN_MASK_ON, NULL);
 
-	if ((mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF) == NULL)
-			|| (mt_search_texture(HOOK_MMENU_SCREEN_MASK_ON) == NULL)) {
-		printf("could not load textures for menu!\n");
+	if (mt_search_texture(HOOK_MMENU_SCREEN_MASK_OFF) == NULL) {
+		printf("could not load textures for the background in main menu!\n");
 		quit_game_with_log_error("data management error.\n", 1);
 	}
 
@@ -181,7 +180,7 @@ void mg_run() {
 		if (mg_main_game_state == ST_HALL_OF_FAME) {
 			// start Hall of Fame
 			hof_run(score);
-			mg_main_game_state = hof_get_game_state();
+			mg_main_game_state = hof_get_state();
 		}
 	}
 

@@ -1,56 +1,85 @@
-#include <D_HOF_Data.h>
-#include "M_Game_Hall_of_Fame.h"
+/***********************************************************************
+ * This is the Module for :
+ *   * showing the data of the highscore-table
+ *   * managing the highscore-table
+ *   * rendering the highscore-table to the screen
+ *
+ **********************************************************************/
 
-#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
+#include "D_HOF_Data.h"
+#include "M_Game_Hall_of_Fame.h"
 #include "D_Common.h"
 #include "D_fonts.h"
 #include "S_Quit.h"
 #include "S_SDL3_Rendering.h"
 #include "S_FPS_Counter.h"
 
-static int hof_exit_flag;
-static int hof_game_state;
-static int hof_flag_fps;
+static int hof_exit_flag;  // wether the user wants to quit the game
+static int hof_game_state; // state of the hall-of-fame-module
+static int hof_flag_fps;   // wether the fps should be shown
 
-static HSCData *current_score = NULL;
+static HSCData_t *current_score = NULL;   // a pointer to the current entry-record
 
-static int hof_edit;
-static int hof_save;
-static int hof_change_entry;
-static int hof_change_index;
-static int hof_letter_index;
-static int hof_first_letter_set;
+static int hof_edit;  // wether the hall of fame is editable
+static int hof_save;  // wether the hall of fame file can be saved
+static int hof_change_entry; // wether the current entry can be changed
+static int hof_change_index; // the index of the record that you can change
+static int hof_letter_index; // index of the latter you typed in the highscore-table
+static int hof_first_letter_set; // wether at least one letter is set for a highscore-record
 
-static HSCData *hof_data[MAX_TOPS];
+static HSCData_t *hof_data[MAX_TOPS]; // an array of pointers to highscore-records
 
-static unsigned int hof_score;
+static unsigned int hof_score;      // current score
 
+/* The main loop: Where all (user) actions are orchestrated
+ * and interpreted, and every image is rendered.
+ */
 static void hof_main_loop(void);
 
+/* This function interprets keyboard inputs and
+ * initiates corresponding actions. */
 static void hof_dispatch_keyboard_events(void);
+
+/* For rendering the data of the highscore-table to the screen. */
 static void hof_core_render(void);
 
+/* initialize the highscore-table */
 static void hof_init(unsigned int p_score);
 
-static void print_hof_table(void);
+/* print the table to the console for debugging purpose. */
+static void hof_print_table(void);
 
-static void read_highscore(void);
+/* reads the highscore-data-file which contains all data of our highscore-table. */
+static void hof_read_highscore(void);
 
-static void save_highscore(void);
+/* writes the (new) data to the highscore-data-file. */
+static void hof_save_highscore(void);
 
-static void free_highscore_table(void);
+/* cleanup the hall of fame after all is done. */
+static void hof_free_highscore_table(void);
 
-static void position_current_score(void);
+/* find out, which place the current highscore reaches and put it there. */
+static void hof_position_current_score(void);
 
-static void hof_insert_rank(int p_position, HSCData *p_data);
+/* recursive repositioning of a (new) highscore-record. */
+static void hof_insert_rank(int p_position, HSCData_t *p_data);
 
+/* get the last position in the highscore-table. */
 static int hof_get_max_index(void);
-static void init_highscore_table(void);
 
+/* clears all pointers to the highscore-table-records to NULL */
+static void hof_clear_highscore_table(void);
+
+
+/**************************************************************************
+ *
+ * get the last position in the highscore-table.
+ *
+ **************************************************************************/
 static int hof_get_max_index() {
 	int ret = 0;
 	int i = 0;
@@ -63,18 +92,33 @@ static int hof_get_max_index() {
 	return ret;
 }
 
-static void print_hof_table() {
+/**************************************************************************
+ *
+ * print the table to the console for debugging purpose.
+ *
+ **************************************************************************/
+static void hof_print_table() {
 	for (int i = 0; (i < MAX_TOPS) && (hof_data[i] != NULL); i++) {
 		printf("SCORE : %s, NAME : %s.\n", hof_data[i]->score,
 				hof_data[i]->name);
 	}
 }
 
+/**************************************************************************
+ *
+ * init's the hall of fame and starts the main-loop.
+ *
+ **************************************************************************/
 void hof_run(unsigned int p_score) {
 	hof_init(p_score);
 	hof_main_loop();
 }
 
+/**************************************************************************
+ *
+ * initialize the highscore-table.
+ *
+ **************************************************************************/
 static void hof_init(unsigned int p_score) {
 
 	printf("init hall of fame...\n");
@@ -92,24 +136,32 @@ static void hof_init(unsigned int p_score) {
 
 	printf("score is %d, hof_edit is %d.\n", hof_score, hof_edit);
 
-	init_highscore_table();
-	/*printf("after init :\n");
-	 print_hof_table();*/
+	hof_clear_highscore_table();
 
-	read_highscore();
+	hof_read_highscore();
 
 	printf("after read :\n");
-	print_hof_table();
+	hof_print_table();
 
 }
 
-static void init_highscore_table() {
+/**************************************************************************
+ *
+ * clears all pointers to the highscore-table-records to NULL.
+ *
+ **************************************************************************/
+static void hof_clear_highscore_table() {
 	for (int i = 0; i < MAX_TOPS; i++) {
 		hof_data[i] = NULL;
 	}
 }
 
-static void free_highscore_table() {
+/**************************************************************************
+ *
+ * cleanup the hall of fame after all is done.
+ *
+ **************************************************************************/
+static void hof_free_highscore_table() {
 
 	printf("free highscore table...\n");
 
@@ -123,12 +175,17 @@ static void free_highscore_table() {
 	}
 }
 
-static void hof_insert_rank(int p_position, HSCData *p_data) {
+/**************************************************************************
+ *
+ * recursive repositioning of a (new) highscore-record.
+ *
+ **************************************************************************/
+static void hof_insert_rank(int p_position, HSCData_t *p_data) {
 	if (p_data != NULL) {
 		printf("inserting %s[%s] at index %d.\n", p_data->name, p_data->score,
 				p_position);
 
-		HSCData *temp = NULL;
+		HSCData_t *temp = NULL;
 
 		if (p_position < MAX_TOPS - 1) {
 
@@ -147,7 +204,12 @@ static void hof_insert_rank(int p_position, HSCData *p_data) {
 	}
 }
 
-static void save_highscore(void) {
+/**************************************************************************
+ *
+ * writes the (new) data to the highscore-data-file.
+ *
+ **************************************************************************/
+static void hof_save_highscore(void) {
 	printf("saving highscore...\n");
 
 	int max_index = hof_get_max_index();
@@ -186,7 +248,12 @@ static void save_highscore(void) {
 	}
 }
 
-static void position_current_score() {
+/**************************************************************************
+ *
+ * find out, which place the current highscore reaches and put it there.
+ *
+ **************************************************************************/
+static void hof_position_current_score() {
 
 	printf("new highscore? : %d\n", hof_score);
 
@@ -199,7 +266,7 @@ static void position_current_score() {
 		int i = 0;
 		int found_place = FALSE;
 
-		current_score = (HSCData*) calloc(1, sizeof(HSCData));
+		current_score = (HSCData_t*) calloc(1, sizeof(HSCData_t));
 
 		snprintf(current_score->score, MAX_SCORE_LEN, "%d", hof_score);
 		snprintf(current_score->name, MAX_NAME_LEN, "%s", "");
@@ -232,7 +299,13 @@ static void position_current_score() {
 	}
 }
 
-static void read_highscore() {
+/**************************************************************************
+ *
+ * reads the highscore-data-file which contains
+ * all data of our highscore-table.
+ *
+ **************************************************************************/
+static void hof_read_highscore() {
 	FILE *f = fopen(FILE_HOF, "r");
 
 	if (f == NULL) {
@@ -259,7 +332,7 @@ static void read_highscore() {
 		token = strtok(line, HOF_DELIMITER);
 		printf("\n");
 
-		hof_data[i] = (HSCData*) calloc(1, sizeof(HSCData));
+		hof_data[i] = (HSCData_t*) calloc(1, sizeof(HSCData_t));
 
 		while (token != NULL) {
 
@@ -287,18 +360,29 @@ static void read_highscore() {
 	fclose(f);
 }
 
-int hof_get_game_state() {
+/**************************************************************************
+ *
+ * Returns the state of the hof-module.
+ *
+ **************************************************************************/
+int hof_get_state() {
 	return hof_game_state;
 }
 
+/**************************************************************************
+ *
+ * The main loop: Where all (user) actions are orchestrated
+ * and interpreted, and every image is rendered.
+ *
+ **************************************************************************/
 static void hof_main_loop() {
 	printf("entering hall of fame loop...");
 
 	printf("setting score %u\n", hof_score);
 
-	position_current_score();
+	hof_position_current_score();
 
-	print_hof_table();
+	hof_print_table();
 
 	int limit_fps_flag = LIMIT_FPS;
 
@@ -314,10 +398,16 @@ static void hof_main_loop() {
 		hof_core_render();
 	}
 
-	free_highscore_table();
+	hof_free_highscore_table();
 
 }
 
+/**************************************************************************
+ *
+ * This function interprets keyboard inputs and
+ * initiates corresponding actions.
+ *
+ **************************************************************************/
 static void hof_dispatch_keyboard_events() {
 
 	SDL_Event event;
@@ -344,7 +434,7 @@ static void hof_dispatch_keyboard_events() {
 				if (event.key.key == SDLK_RETURN) {
 					if (hof_first_letter_set) {
 						hof_edit = FALSE;
-						save_highscore();
+						hof_save_highscore();
 					}
 					return;
 				}
@@ -396,6 +486,11 @@ static void hof_dispatch_keyboard_events() {
 	}
 }
 
+/**************************************************************************
+ *
+ * For rendering the data of the highscore-table to the screen.
+ *
+ **************************************************************************/
 static void hof_core_render() {
 	sdla_clear_buffer();
 

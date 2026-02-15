@@ -5,8 +5,6 @@
 
 #include <SDL3/SDL.h>
 
-#include <time.h>
-#include "D_Common.h"
 #include "D_fonts.h"
 #include "S_Game_Objects.h"
 #include "S_Quit.h"
@@ -15,48 +13,37 @@
 #include "S_FPS_Counter.h"
 
 static int cg_game_state;
-static int cg_exit_flag;
 static int cg_flag_fps;
 static int cg_flag_break;
 
 /***************************************************/
 /* MODULE INTERN VARIABLES & PROTOTYPES            */
 /***************************************************/
-
 /* init the coregame. */
 static int cg_init(void);
-
 static int cg_booted = FALSE;
-
 /***************************************************/
 /* THE MAP, THE Piece_t, NEXT Piece_t AND STATISTICS   */
 /***************************************************/
-
 /* the current map */
 static MapData_t cg_map_data;
 /* the next Piece_t */
 static Piece_t cg_next_piece;
 /* the current Piece_t */
 static Piece_t cg_current_piece;
-
 /* some game statistics */
 static GameStats_t cg_stats;
-
 /***************************************************/
 /* GAME OVER STATUS CHECKING                       */
 /***************************************************/
-
 /* the algorithm to check if its game over. */
-static unsigned short cg_check_game_over();
-
+static unsigned short cg_check_game_over(void);
 /* wether its game over or not */
 static unsigned short cg_game_over_flag;
-
 /***************************************************/
 /* SHAPE IDS                                       */
 /***************************************************/
-
-/* all ids of the shapes, defined in gobs.c */
+/* all ids of the shapes, defined in S_Game_Objects.c */
 extern char *gal_shape_ids[];
 /***************************************************/
 /*            MAIN LOOP                            */
@@ -66,34 +53,29 @@ static void cg_main_loop(void);
 /* Collision detection functions                   */
 /* - the heart of the game.                        */
 /***************************************************/
-
 static int cg_collision_detection(int p_direction, double add_y);
 static unsigned short cg_poi_is_block(int p_index, double p_add_x,
 		double p_add_y, int p_direction);
-
 /* always up to date information of
  current collisions */
 static unsigned int cg_collis_det_info;
-
 /***************************************************/
-/* Functions manipulating the Piece_ts. */
+/* Functions for manipulating the pieces.          */
 /***************************************************/
-
-static void cg_game_update();
+static void cg_game_update(void);
 static void cg_spawn_new_piece(Piece_t *pce);
 static void cg_park_piece(void);
-static void cg_cur_piece_rotate();
-static double cg_calc_fall();
-static void cg_switch_next_piece();
-static void cg_drop_piece();
-
+static void cg_cur_piece_rotate(void);
+static double cg_calc_fall(void);
+static void cg_switch_next_piece(void);
+static void cg_drop_piece(void);
+/* the current fall speed of the piece */
 static double cg_current_speed;
+/* in some cases we need to reset the current speed to cg_reset_speed */
 static double cg_reset_speed;
-
-/***************************************************/
+/*********************************************************/
 /* This is for checking full lines and let them implode. */
-/***************************************************/
-
+/*********************************************************/
 static void cg_check_full_lines(void);
 static void cg_implode_full_lines(void);
 static unsigned short cg_found_full_lines(void);
@@ -102,52 +84,38 @@ static void cg_let_line_fade(unsigned int p_y);
 static void cg_map_delete_line(unsigned int p_y);
 static void cg_map_tumble_lines(unsigned int p_above_y);
 static void cg_check_level(void);
-
 /* an array of the full lines marked for imploding */
 static int cg_full_lines[MAX_FULL_LINES];
 static int cg_full_lines_index;
 /* time in ms since the full line has been marked for implode */
 static int cg_toi;
 static int cg_impalpha;
-
 /***************************************************/
 /* Event management.                               */
 /***************************************************/
-
 /* Dispatch of the events delivered by the Multi-Media-
  Manager like SDL3 */
-//static void cg_dispatch_core_events(int p_ev);
 static void cg_dispatch_keyboard_events(void);
-
 /***************************************************/
 /* Some render-functions.                          */
 /***************************************************/
-
 static void cg_core_render(char *p_extra_text);
 static void cg_piece_render(Piece_t *p_pce);
 static void cg_map_render(MapData_t *p_map);
 static void cg_render_stats(void);
-
 static void cg_render_next_piece(void);
-
-/***************************************************/
-
 /***************************************************/
 /* VARIABLES USED FOR TIME MEASUREMENT             */
 /***************************************************/
-
-// for time measurements where it is needed
+/* for time measurements where moments of interest have to be remembered */
 static double cg_moment_of_interest1;
 static double cg_moment_of_interest2;
 /* old time of measure of the fall of the Piece_t */
 static double cg_fall_mea_old_time;
-
-/***************************************************/
-
-/***************************************************/
-/* VARIABLE USED FOR EXTRA INFORMATION             */
-/***************************************************/
-
+/*********************************************************/
+/* VARIABLE USED FOR EXTRA INFORMATION FOR THE PLAYER    */
+/* FOR EXAMPLE : GAME OVER, BREAK, QUAD-BONUS etc. etc.  */
+/*********************************************************/
 static char cg_extra_text[MAX_LEN_EXTRA_TEXT];
 
 
@@ -160,6 +128,68 @@ unsigned int cg_run() {
 	cg_main_loop();
 	printf("returning score : %u\n", cg_stats.score);
 	return (cg_stats.score);
+}
+
+/* The core games main loop, called by the game manager. */
+static void cg_main_loop() {
+	/* reset the core-game stats and values ... */
+	//cg_init();
+
+	double time_gone=0;
+	int limit_fps_flag = LIMIT_FPS;
+
+	cg_moment_of_interest1 = SDL_GetPerformanceCounter();
+	cg_moment_of_interest2 = cg_moment_of_interest1;
+
+
+	printf("entering core loop...\n");
+	printf("game state is : %d\n", cg_game_state);
+
+	/* loop until exit game or other main game state */
+	while (cg_game_state == ST_CORE_GAME) {
+
+		cou_inc_frame();
+		cou_calc_fps();
+		if (limit_fps_flag) {
+			cou_limit_fps();
+		}
+
+		/* check for game over state */
+		if (cg_game_over_flag==0) cg_check_game_over();
+
+		/* if not game over ... */
+		if (cg_game_over_flag==0) {
+
+			// check keys pressed and dispatch the delivered events
+			cg_dispatch_keyboard_events();
+			// If the game is not in break state.
+			if (!cg_flag_break) {
+
+				cg_game_update();
+			}
+			/* render all. */
+			cg_core_render(cg_extra_text);
+		} else if (cg_game_over_flag==1) {
+
+			strncpy(cg_extra_text, TEXT_GAME_OVER, MAX_LEN_EXTRA_TEXT-1);
+			cg_moment_of_interest2 = SDL_GetPerformanceCounter();
+			time_gone = ((cg_moment_of_interest2 - cg_moment_of_interest1)
+					/ cou_get_freq()) * SEC_UNIT;
+			printf("time_gone since game over : %f\n", time_gone);
+			// if LAST_MOVE_WAIT ms are gone... */
+			if (time_gone > GAME_OVER_DELAY) {
+				cg_game_over_flag = 2;
+				cg_extra_text[0]='\0';
+			}
+			cg_core_render(cg_extra_text);
+		} else if (cg_game_over_flag==2) {
+			/* Change the state of the game to state HALL OF FAME
+			 This will end THIS main-loop in next loop. */
+			cg_game_state = ST_HALL_OF_FAME;
+		}
+	}
+	printf("exit core loop.\n");
+	printf("game state is : %d.\n", cg_game_state);
 }
 
 int cg_get_game_state() {
@@ -176,7 +206,6 @@ static int cg_init() {
 		cg_booted = TRUE;
 	}
 
-	cg_exit_flag = FALSE;
 	cg_game_state = ST_CORE_GAME;
 	cg_flag_fps = FALSE;
 
@@ -226,69 +255,6 @@ static int cg_init() {
 	return TRUE;
 }
 
-/* render a Piece_t to screen. */
-static void cg_piece_render(Piece_t *p_pce) {
-	int color = p_pce->id_no + 1;
-	int value_of_shape = 0;
-
-	int drawx = 0;
-	int drawy = 0;
-
-	ShapeData_t *sh = p_pce->sh_data[p_pce->direction];
-
-	int index = 0;
-	int x = 0;
-	int y = 0;
-
-	for (index = 0; index < PIECE_WIDTH * PIECE_HEIGHT; index++) {
-
-		x = p_pce->x;
-		y = p_pce->y;
-
-		drawx = index % PIECE_WIDTH - sh->min_x;
-		drawy = index / PIECE_WIDTH - sh->min_y;
-
-		value_of_shape = sh->matrix[index];
-
-		if (value_of_shape > FREE) {
-			sdla_draw_block(x + drawx, y + drawy, color);
-		}
-	}
-}
-
-/* render a map to screen. */
-static void cg_map_render(MapData_t *p_map) {
-	/* Draw the Piece_t shape in the console */
-
-	/* Initialize the value of the shape */
-	int value_of_matrix = 0;
-
-	int drawx = 0;
-	int drawy = 0;
-	int percent = 0;
-
-	for (drawy = 0; drawy < MAP_HEIGHT; drawy++) {
-		for (drawx = 0; drawx < MAP_WIDTH; drawx++) {
-
-			value_of_matrix = p_map->matrix[drawy * MAP_WIDTH + drawx];
-
-			if (value_of_matrix > FREE) {
-				sdla_draw_block(p_map->x + drawx, p_map->y + drawy,
-						value_of_matrix);
-			} else if (value_of_matrix == FREE) {
-				sdla_draw_free(p_map->x + drawx, p_map->y + drawy,
-						p_map->color);
-			} else if (value_of_matrix == IMPLODING) {
-				percent = cg_toi / (IMPLODING_TIME / 100);
-				cg_impalpha = ALPHA_SOLID - ((ALPHA_SOLID / 100) * percent);
-				printf("ALPHA : %d\n", cg_impalpha);
-				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, 0,
-						cg_impalpha);
-			}
-		}
-	}
-}
-
 /* clears the full-lines-array and the index counter. The array indicates,
  * which lines in the map are full. Contains in max MAX_FULL_LINES(=4)
  * integers for the y-value of the full line.
@@ -321,105 +287,6 @@ static unsigned short cg_check_game_over() {
 	return FALSE;
 }
 
-/* a sub-function of the central collision detection - it's the heart of the game.
- Its used to calculate, if at specific point of interest
- is a block or free area. */
-static unsigned short cg_poi_is_block(int p_index, double p_add_x,
-		double p_add_y, int p_direction) {
-	double check_x = cg_current_piece.x + (p_index % PIECE_WIDTH) + p_add_x
-			- cg_current_piece.sh_data[p_direction]->min_x;
-
-	double check_y = cg_current_piece.y + (p_index / PIECE_WIDTH) + p_add_y
-			- cg_current_piece.sh_data[p_direction]->min_y;
-
-	int x = check_x;
-	int y = check_y;
-
-	if ((x < 0) || (x >= MAP_WIDTH))
-		return TRUE;
-	if ((y < 0) || (y >= MAP_HEIGHT))
-		return TRUE;
-
-	/* check if in point of interest is a block */
-	if ((cg_map_data.matrix[y * MAP_WIDTH + x] > FREE)) {
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
-/* the central collision detection. the heart of the game.
- * This function checks for collisions between the Piece_t and the map
- * If a collision is detected at all borders, the Piece_t is set to not moveable.
- *
- * This function returns an integer, where several bits are used to
- * mark a collision :
- *
- *  Collision Bit masks
- *
- *  collision below, bit 2 is set
- *  COLL_BELOW  : 4   (binary 100)
- *
- *  collision left, bit 0 is set.
- *  COLL_LEFT   : 1   (binary 001)
- *
- *  collision right, bit 1 is set
- *  COLL_RIGHT  : 2   (binary 010)
- *
- *  collision left+right+below, bit 0,1,2 are set (=7)
- *  COLL_ALL    : 7   (binary 111)
- */
-static int cg_collision_detection(int p_direction, double p_add_y) {
-
-	int collision_bits = 0;
-
-	/* This function checks for collisions between the Piece_t and the map.
-	 If a collision is detected, the Piece_t is set to not moveable
-	 and the unsigned short "1" is returned */
-
-	if (!cg_current_piece.moveable) {
-		/* set all status bits in return */
-		return COLL_ALL;
-	}
-
-	/* unsigned int map_poi_y = 0; */
-	int index = 0;
-
-	for (index = 0;
-			(index < PIECE_WIDTH * PIECE_HEIGHT) && (collision_bits != COLL_ALL);
-			index++) {
-
-		if (cg_current_piece.sh_data[p_direction]->matrix[index] > FREE) {
-			/* calculate point of interest in the map
-			 dont forget : the Piece_t's x and y coordinates are
-			 relative in the maps field. */
-
-			/* check if Piece_t overlaps with another Piece_t in the map */
-			if (cg_poi_is_block(index, 0, 0, p_direction)) {
-				/* set bit for collision below */
-				collision_bits = COLL_ALL;
-			}
-
-			/* check below Piece_t for collision */
-			if (cg_poi_is_block(index, 0, p_add_y, p_direction)) {
-				/* set bit for collision below */
-				collision_bits |= COLL_BELOW;
-			}
-			/* check if on the left side is a block */
-			if (cg_poi_is_block(index, -1, p_add_y, p_direction)) {
-				/* on the left side is a block */
-				collision_bits |= COLL_LEFT;
-			}
-			/* check if on the right side is a block */
-			if (cg_poi_is_block(index, 1, p_add_y, p_direction)) {
-				/* on the right side is a block */
-				collision_bits |= COLL_RIGHT;
-			}
-		}
-	}
-	return collision_bits;
-}
-
 /* rotate Piece_t */
 static void cg_cur_piece_rotate() {
 	gal_piece_rotate(&cg_current_piece);
@@ -438,15 +305,6 @@ static double cg_calc_fall() {
 	cg_fall_mea_old_time = current_time;
 
 	return fall_y_axis;
-}
-
-/* Mark a line as an imploding line */
-static void cg_let_line_fade(unsigned int p_y) {
-	size_t x = 0;
-
-	for (x = 0; x < cg_map_data.width; x++) {
-		cg_map_data.matrix[p_y * cg_map_data.width + x] = IMPLODING;
-	}
 }
 
 /* Check the map for full lines and mark them for imploding */
@@ -474,38 +332,6 @@ static void cg_check_full_lines() {
 			cg_full_lines[cg_full_lines_index] = y;
 			cg_full_lines_index++;
 		}
-	}
-}
-
-/* After a line implodes, all above has to be move down one row. */
-static void cg_map_tumble_lines(unsigned int p_above_y) {
-	int up_to_index = (p_above_y - 1) * cg_map_data.width + cg_map_data.width;
-
-	if (up_to_index >= MAP_WIDTH * MAP_HEIGHT) {
-
-		printf("up_to_index : out of range [%d]", up_to_index);
-		quit_game_with_log_error("index out of range.", 1);
-	}
-
-	/* bring a copy from matrix above y to buffer */
-	int index_matrix = 0;
-	int index_buffer = 0;
-	while (index_matrix < up_to_index)
-		cg_map_data.buffer[index_buffer++] = cg_map_data.matrix[index_matrix++];
-
-	/* start one line below - and copy back from buffer to matrix */
-	index_matrix = cg_map_data.width;
-	index_buffer = 0;
-	while (index_buffer < up_to_index)
-		cg_map_data.matrix[index_matrix++] = cg_map_data.buffer[index_buffer++];
-}
-
-/* Mark a line as completely FREE. */
-static void cg_map_delete_line(unsigned int p_y) {
-	size_t x = 0;
-
-	for (x = 0; x < cg_map_data.width; x++) {
-		cg_map_data.matrix[p_y * cg_map_data.width + x] = FREE;
 	}
 }
 
@@ -805,67 +631,7 @@ static void cg_game_update() {
 	}
 }
 
-/* The core games main loop, called by the game manager. */
-static void cg_main_loop() {
-	/* reset the core-game stats and values ... */
-	//cg_init();
 
-	double time_gone=0;
-	int limit_fps_flag = LIMIT_FPS;
-
-	cg_moment_of_interest1 = SDL_GetPerformanceCounter();
-	cg_moment_of_interest2 = cg_moment_of_interest1;
-
-
-	printf("entering core loop...\n");
-	printf("game state is : %d\n", cg_game_state);
-
-	/* loop until exit game or other main game state */
-	while (cg_game_state == ST_CORE_GAME) {
-
-		cou_inc_frame();
-		cou_calc_fps();
-		if (limit_fps_flag) {
-			cou_limit_fps();
-		}
-
-		/* check for game over state */
-		if (cg_game_over_flag==0) cg_check_game_over();
-
-		/* if not game over ... */
-		if (cg_game_over_flag==0) {
-
-			// check keys pressed and dispatch the delivered events
-			cg_dispatch_keyboard_events();
-			// If the game is not in break state.
-			if (!cg_flag_break) {
-
-				cg_game_update();
-			}
-			/* render all. */
-			cg_core_render(cg_extra_text);
-		} else if (cg_game_over_flag==1) {
-
-			strncpy(cg_extra_text, TEXT_GAME_OVER, MAX_LEN_EXTRA_TEXT-1);
-			cg_moment_of_interest2 = SDL_GetPerformanceCounter();
-			time_gone = ((cg_moment_of_interest2 - cg_moment_of_interest1)
-					/ cou_get_freq()) * SEC_UNIT;
-			printf("time_gone since game over : %f\n", time_gone);
-			// if LAST_MOVE_WAIT ms are gone... */
-			if (time_gone > GAME_OVER_DELAY) {
-				cg_game_over_flag = 2;
-				cg_extra_text[0]='\0';
-			}
-			cg_core_render(cg_extra_text);
-		} else if (cg_game_over_flag==2) {
-			/* Change the state of the game to state HALL OF FAME
-			 This will end THIS main-loop in next loop. */
-			cg_game_state = ST_HALL_OF_FAME;
-		}
-	}
-	printf("exit core loop.\n");
-	printf("game state is : %d.\n", cg_game_state);
-}
 
 static void cg_render_next_piece() {
 
@@ -879,8 +645,8 @@ static void cg_render_next_piece() {
 
 	size_t index = 0;
 
-	sdla_printf_tex2(310, 106, 3, "NEXT");
-	sdla_printf_tex2(310, 106 + YSPACEING, 3, "PIECE");
+	sdla_printf_tex3(310, 106, 3, GLOBAL_FONT_TRANSPARENCY, "NEXT");
+	sdla_printf_tex3(310, 106 + YSPACEING, 3, GLOBAL_FONT_TRANSPARENCY, "PIECE");
 
 	for (index = 0; index < PIECE_WIDTH * PIECE_HEIGHT; index++) {
 
@@ -901,7 +667,7 @@ static void cg_render_stats() {
 
 	int transparency = GLOBAL_FONT_TRANSPARENCY;
 
-	sdla_printf_tex2(922, 113, 3, "STATISTICS");
+	sdla_printf_tex3(922, 113, 3, transparency, "STATISTICS");
 
 	// lines
 	sdla_printf_tex3(DRAW_STATISTICS_START_X, DRAW_STATISTICS_START_Y, 5,
@@ -1058,6 +824,209 @@ static void cg_dispatch_keyboard_events() {
 
 			if (event.key.key == SDLK_DOWN) {
 				cg_current_speed = cg_reset_speed;
+			}
+		}
+	}
+}
+
+/* the central collision detection. the heart of the game.
+ * This function checks for collisions between the Piece_t and the map
+ * If a collision is detected at all borders, the Piece_t is set to not moveable.
+ *
+ * This function returns an integer, where several bits are used to
+ * mark a collision :
+ *
+ *  Collision Bit masks
+ *
+ *  collision below, bit 2 is set
+ *  COLL_BELOW  : 4   (binary 100)
+ *
+ *  collision left, bit 0 is set.
+ *  COLL_LEFT   : 1   (binary 001)
+ *
+ *  collision right, bit 1 is set
+ *  COLL_RIGHT  : 2   (binary 010)
+ *
+ *  collision left+right+below, bit 0,1,2 are set (=7)
+ *  COLL_ALL    : 7   (binary 111)
+ */
+static int cg_collision_detection(int p_direction, double p_add_y) {
+
+	int collision_bits = 0;
+
+	/* This function checks for collisions between the Piece_t and the map.
+	 If a collision is detected, the Piece_t is set to not moveable
+	 and the unsigned short "1" is returned */
+
+	if (!cg_current_piece.moveable) {
+		/* set all status bits in return */
+		return COLL_ALL;
+	}
+
+	/* unsigned int map_poi_y = 0; */
+	int index = 0;
+
+	for (index = 0;
+			(index < PIECE_WIDTH * PIECE_HEIGHT) && (collision_bits != COLL_ALL);
+			index++) {
+
+		if (cg_current_piece.sh_data[p_direction]->matrix[index] > FREE) {
+			/* calculate point of interest in the map
+			 dont forget : the Piece_t's x and y coordinates are
+			 relative in the maps field. */
+
+			/* check if Piece_t overlaps with another Piece_t in the map */
+			if (cg_poi_is_block(index, 0, 0, p_direction)) {
+				/* set bit for collision below */
+				collision_bits = COLL_ALL;
+			}
+
+			/* check below Piece_t for collision */
+			if (cg_poi_is_block(index, 0, p_add_y, p_direction)) {
+				/* set bit for collision below */
+				collision_bits |= COLL_BELOW;
+			}
+			/* check if on the left side is a block */
+			if (cg_poi_is_block(index, -1, p_add_y, p_direction)) {
+				/* on the left side is a block */
+				collision_bits |= COLL_LEFT;
+			}
+			/* check if on the right side is a block */
+			if (cg_poi_is_block(index, 1, p_add_y, p_direction)) {
+				/* on the right side is a block */
+				collision_bits |= COLL_RIGHT;
+			}
+		}
+	}
+	return collision_bits;
+}
+
+/* a sub-function of the central collision detection - it's the heart of the game.
+ Its used to calculate, if at specific point of interest
+ is a block or free area. */
+static unsigned short cg_poi_is_block(int p_index, double p_add_x,
+		double p_add_y, int p_direction) {
+	double check_x = cg_current_piece.x + (p_index % PIECE_WIDTH) + p_add_x
+			- cg_current_piece.sh_data[p_direction]->min_x;
+
+	double check_y = cg_current_piece.y + (p_index / PIECE_WIDTH) + p_add_y
+			- cg_current_piece.sh_data[p_direction]->min_y;
+
+	int x = check_x;
+	int y = check_y;
+
+	if ((x < 0) || (x >= MAP_WIDTH))
+		return TRUE;
+	if ((y < 0) || (y >= MAP_HEIGHT))
+		return TRUE;
+
+	/* check if in point of interest is a block */
+	if ((cg_map_data.matrix[y * MAP_WIDTH + x] > FREE)) {
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+/* Mark a line as an imploding line */
+static void cg_let_line_fade(unsigned int p_y) {
+	size_t x = 0;
+
+	for (x = 0; x < cg_map_data.width; x++) {
+		cg_map_data.matrix[p_y * cg_map_data.width + x] = IMPLODING;
+	}
+}
+
+/* Mark a line as completely FREE. */
+static void cg_map_delete_line(unsigned int p_y) {
+	size_t x = 0;
+
+	for (x = 0; x < cg_map_data.width; x++) {
+		cg_map_data.matrix[p_y * cg_map_data.width + x] = FREE;
+	}
+}
+
+/* After a line implodes, all above has to be move down one row. */
+static void cg_map_tumble_lines(unsigned int p_above_y) {
+	int up_to_index = (p_above_y - 1) * cg_map_data.width + cg_map_data.width;
+
+	if (up_to_index >= MAP_WIDTH * MAP_HEIGHT) {
+
+		printf("up_to_index : out of range [%d]", up_to_index);
+		quit_game_with_log_error("index out of range.", 1);
+	}
+
+	/* bring a copy from matrix above y to buffer */
+	int index_matrix = 0;
+	int index_buffer = 0;
+	while (index_matrix < up_to_index)
+		cg_map_data.buffer[index_buffer++] = cg_map_data.matrix[index_matrix++];
+
+	/* start one line below - and copy back from buffer to matrix */
+	index_matrix = cg_map_data.width;
+	index_buffer = 0;
+	while (index_buffer < up_to_index)
+		cg_map_data.matrix[index_matrix++] = cg_map_data.buffer[index_buffer++];
+}
+
+/* render a Piece_t to screen. */
+static void cg_piece_render(Piece_t *p_pce) {
+	int color = p_pce->id_no + 1;
+	int value_of_shape = 0;
+
+	int drawx = 0;
+	int drawy = 0;
+
+	ShapeData_t *sh = p_pce->sh_data[p_pce->direction];
+
+	int index = 0;
+	int x = 0;
+	int y = 0;
+
+	for (index = 0; index < PIECE_WIDTH * PIECE_HEIGHT; index++) {
+
+		x = p_pce->x;
+		y = p_pce->y;
+
+		drawx = index % PIECE_WIDTH - sh->min_x;
+		drawy = index / PIECE_WIDTH - sh->min_y;
+
+		value_of_shape = sh->matrix[index];
+
+		if (value_of_shape > FREE) {
+			sdla_draw_block(x + drawx, y + drawy, color);
+		}
+	}
+}
+
+/* render a map to screen. */
+static void cg_map_render(MapData_t *p_map) {
+	/* Draw the Piece_t shape in the console */
+
+	/* Initialize the value of the shape */
+	int value_of_matrix = 0;
+
+	int drawx = 0;
+	int drawy = 0;
+	int percent = 0;
+
+	for (drawy = 0; drawy < MAP_HEIGHT; drawy++) {
+		for (drawx = 0; drawx < MAP_WIDTH; drawx++) {
+
+			value_of_matrix = p_map->matrix[drawy * MAP_WIDTH + drawx];
+
+			if (value_of_matrix > FREE) {
+				sdla_draw_block(p_map->x + drawx, p_map->y + drawy,
+						value_of_matrix);
+			} else if (value_of_matrix == FREE) {
+				sdla_draw_free(p_map->x + drawx, p_map->y + drawy,
+						p_map->color);
+			} else if (value_of_matrix == IMPLODING) {
+				percent = cg_toi / (IMPLODING_TIME / 100);
+				cg_impalpha = ALPHA_SOLID - ((ALPHA_SOLID / 100) * percent);
+				printf("ALPHA : %d\n", cg_impalpha);
+				sdla_draw_imp(p_map->x + drawx, p_map->y + drawy, 0,
+						cg_impalpha);
 			}
 		}
 	}
